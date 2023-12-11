@@ -1,9 +1,8 @@
 import express from 'express';
 import axios from "axios";
 import mongoose from 'mongoose';
+import { API_KEY,BASE_URL } from '../config.js';
 
-const API_KEY = "api_key=bb012497a5716b5ecdaee69ad9cbad2a";
-const BASE_URL = "https://api.themoviedb.org/3"
 const API_URL = `${BASE_URL}/discover/movie?sort_by=popularity.desc&${API_KEY}`; // Template literal
 const SEARCH_URL = `${BASE_URL}/search/movie?${API_KEY}`
 const router = express.Router();

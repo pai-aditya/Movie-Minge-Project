@@ -14,7 +14,7 @@ const MovieSingleCard = ({movie}) => {
           <div className="h-4/5 relative">
             <img className="w-full h-full object-cover" src={image_url} alt={movie_title} />
             <div className="absolute top-0 left-0 w-full h-full bg-black bg-opacity-90 opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-              <Link to={`/reviews/${movie_id}`}>
+              <Link to={`/explore/${movie_id}`}>
                 <div className="text-white text-center">
                   <p className="text-xs">{overview}</p>
                   <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-2">

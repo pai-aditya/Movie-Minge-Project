@@ -20,12 +20,11 @@ const Home = () => {
 
     useEffect(() => {
         setLoading(true);
-        if(!searchQuery){
-            
+      if(!searchQuery){
+          
         axios
           .get(`http://localhost:5555/home/${pageNo}`)
           .then((res) => {
-            console.log("logging this "+res.data);
             setMovies(res.data.results);
             setTotalPages(res.data.total_pages);
             setLoading(false);
@@ -35,8 +34,6 @@ const Home = () => {
             setLoading(false);
           });
         }else{
-            
-            console.log("entering this")
                 axios
                 .get(`http://localhost:5555/home/search/${searchQuery}/${pageNo}`)
                 .then((res) => {
@@ -49,7 +46,6 @@ const Home = () => {
                 setLoading(false); // Set loading state to false in case of error
             });
         }
-
 
       }, [pageNo,totalPages,searchQuery]); 
 
@@ -117,7 +113,7 @@ const Home = () => {
           Card
         </button>
       </div> */}
-      <div className='flex justify-between items-center pb-4'>
+      <div className='flex justify-between items-center pt-4 pb-8'>
 
       
 

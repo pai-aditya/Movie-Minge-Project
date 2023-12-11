@@ -2,6 +2,7 @@ import express from "express";
 import {PORT,mongoDBURL} from './config.js'
 import mongoose from 'mongoose';
 import homeRoute from './routes/home.js'
+import exploreRoute from './routes/explore.js'
 import cors from "cors";
 
 
@@ -17,6 +18,7 @@ app.get("/",(req,res)=>{
 
 
 app.use('/home', homeRoute);
+app.use('/explore',exploreRoute);
 
 
 mongoose
