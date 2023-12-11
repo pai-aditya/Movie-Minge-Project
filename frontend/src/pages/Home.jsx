@@ -8,6 +8,10 @@ import Spinner from '../components/Spinner';
 import MoviesCard from "../components/home/MoviesCard";
 import TitleCard from '../components/TitleCard';
 import { backendApiUrl } from '../components/Constants';
+import Sidebar, { SidebarItem } from "../components/Sidebar"
+import {LayoutDashboard,BarChart3,UserCircle,Boxes,Package,Receipt,Settings,LifeBuoy} from "lucide-react"
+
+
 const Home = () => {
 
     const [movies, setMovies] = useState([]);
@@ -70,35 +74,10 @@ const Home = () => {
         setSearchQuery(event.target.value);
     };
 
-    
-    /*
-    const handleSearch = () => {
-        // searchQuery 
-        // Implement your search logic here, for example:
-        // Perform a new API request using the searchQuery
-        // You might update the API request in the useEffect block
-        // to incorporate the search query based on your API structure.
-        setLoading(true); // Set loading state to true while fetching data
-        console.log("is this entering with wiht page="+pageNo+"and with search query ="+searchQuery)
-    // Perform an API request with the search query
-    axios
-        .get(`http://localhost:5555/search/${searchQuery}/${pageNo}`)
-        .then((res) => {
-            setMovies(res.data.results); // Update movies state with the search results
-            setTotalPages(res.data.total_pages); // Update total pages if needed
-            setLoading(false); // Set loading state to false after data is fetched
-        })
-        .catch((err) => {
-            console.log("Error occurred while searching:", err);
-            setLoading(false); // Set loading state to false in case of error
-        });
-    };
-    */
-
 
     return (
         // <div className='bg-red-400 text-white'>Home</div>
-        <div className='p-4 bg-custom-primary-purple'>
+        <div className='p-4 w-full bg-custom-primary-purple'>
       {/* <div className='flex justify-center items-center gap-x-4'>
         <button
           className='bg-sky-300 hover:bg-sky-600 px-4 py-1 rounded-lg'
