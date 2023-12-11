@@ -21,7 +21,6 @@ router.get("/credits/:id", async (req,res) => {
     try {
         const {id} = req.params;
         const response = await axios.get(BASE_URL+"/movie/"+id+"/credits?"+API_KEY);
-        console.log("enterind adiap"+res.json(response.data));
         const result = response.data;
       return res.json(result);
     } catch (error) {

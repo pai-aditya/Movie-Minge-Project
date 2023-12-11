@@ -1,9 +1,12 @@
 import express from "express";
-import {PORT,mongoDBURL} from './config.js'
+import {PORT} from './config.js'
 import mongoose from 'mongoose';
 import homeRoute from './routes/home.js'
 import exploreRoute from './routes/explore.js'
 import cors from "cors";
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 
 const app = express();
@@ -22,7 +25,7 @@ app.use('/explore',exploreRoute);
 
 
 mongoose
-  .connect(mongoDBURL)
+  .connect(process.env.MONGO_CONNECTION)
   .then(() => {
     console.log('App connected to database');
     app.listen(PORT, () => {

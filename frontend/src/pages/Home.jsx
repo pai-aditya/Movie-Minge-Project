@@ -7,7 +7,7 @@ import Spinner from '../components/Spinner';
 // import { MdOutlineAddBox } from 'react-icons/md';
 import MoviesCard from "../components/home/MoviesCard";
 import TitleCard from '../components/TitleCard';
-
+import { backendApiUrl } from '../components/Constants';
 const Home = () => {
 
     const [movies, setMovies] = useState([]);
@@ -23,7 +23,7 @@ const Home = () => {
       if(!searchQuery){
           
         axios
-          .get(`http://localhost:5555/home/${pageNo}`)
+          .get(`${backendApiUrl}/home/${pageNo}`)
           .then((res) => {
             setMovies(res.data.results);
             setTotalPages(res.data.total_pages);
@@ -35,7 +35,7 @@ const Home = () => {
           });
         }else{
                 axios
-                .get(`http://localhost:5555/home/search/${searchQuery}/${pageNo}`)
+                .get(`${backendApiUrl}/home/search/${searchQuery}/${pageNo}`)
                 .then((res) => {
                     setMovies(res.data.results); // Update movies state with the search results
                     setTotalPages(res.data.total_pages); // Update total pages if needed
