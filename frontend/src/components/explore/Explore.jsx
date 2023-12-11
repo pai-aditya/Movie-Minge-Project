@@ -42,7 +42,7 @@ const Explore = () => {
     
 
     return (
-        <div className='p-4'>
+        <div className='p-4 w-full'>
         <BackButton />
         <h1 className='text-3xl my-4'>Movie Info</h1>
         {loading ? (

@@ -11,7 +11,9 @@ export default {
         'custom-primary-purple':'#20234d',
         'custom-gold':'#e99e15',
         'custom-title':'#491cb4',
-        'custom-grey':'#121212'
+        'custom-pink':'#bf1fd0',
+        'custom-grey':'#121212',
+        'custom-hover':'#E667AB'
       },
       fontFamily: {
         roboto: ['Roboto', 'sans-serif'],

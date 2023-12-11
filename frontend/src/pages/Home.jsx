@@ -8,8 +8,6 @@ import Spinner from '../components/Spinner';
 import MoviesCard from "../components/home/MoviesCard";
 import TitleCard from '../components/TitleCard';
 import { backendApiUrl } from '../components/Constants';
-import Sidebar, { SidebarItem } from "../components/Sidebar"
-import {LayoutDashboard,BarChart3,UserCircle,Boxes,Package,Receipt,Settings,LifeBuoy} from "lucide-react"
 
 
 const Home = () => {
