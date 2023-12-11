@@ -9,13 +9,14 @@ import Explore from './components/explore/Explore';
 import Login from './pages/Login';
 import Sidebar from './components/Sidebar'; // Import your Sidebar component
 import SidebarItem from './components/SidebarItem';
-import {Settings,LifeBuoy,Users, BookText, List,ListChecks,LogIn} from "lucide-react"
+import {Home as HomeIcon,Settings,LifeBuoy,Users, BookText, List,ListChecks,LogIn} from "lucide-react";
 
 
 const App = () => {
   return (
     <div className="flex">
       <Sidebar>
+        <SidebarItem icon={<HomeIcon    size={20} />} text="Home" link="/" />
         <SidebarItem icon={<BookText    size={20} />} text="Your Reviews" link="/yourreviews" />
         <SidebarItem icon={<List        size={20}      />} text="Your Lists" link="/yourlists"/>
         <SidebarItem icon={<Users       size={20}     />} text="MovieVerse Community" link="/community"/>
