@@ -16,7 +16,7 @@ app.use(express.json());
 app.use(cors());
 
 app.get("/",(req,res)=>{
-    return res.send("Welcome to  MovieMingle ");
+    return res.send("Welcome to  MovieVerse");
 })
 
 
