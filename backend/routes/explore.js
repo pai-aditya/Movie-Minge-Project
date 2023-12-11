@@ -28,7 +28,4 @@ router.get("/credits/:id", async (req,res) => {
     }
 });
 
-
-
-
 export default router;

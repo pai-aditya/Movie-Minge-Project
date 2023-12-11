@@ -8,43 +8,43 @@ const SEARCH_URL = `${BASE_URL}/search/movie?${API_KEY}`
 const router = express.Router();
 
 const reviewSchema = {
-    movieTitle: String,
-    movieID: String,
-    rating: Number,
-    reviewBody: String
-  }
-  
+  movieTitle: String,
+  movieID: String,
+  rating: Number,
+  reviewBody: String
+}
+
 const Review = mongoose.model("Review",reviewSchema);
 
 router.get("/:pageNo", async (req, res) => {
-    try {
-      // const pageNo = req.body.pageNo;
-      const {pageNo}=req.params;
-      const PAGE_URL = "&page="+pageNo;
-      const response = await axios.get(API_URL+PAGE_URL);
-      const result = response.data;
-      return res.json(result);
-      
-    } catch (error) {
-      console.error("Failed to make request:", error.message);
-    }
-  });
+  try {
+    // const pageNo = req.body.pageNo;
+    const {pageNo}=req.params;
+    const PAGE_URL = "&page="+pageNo;
+    const response = await axios.get(API_URL+PAGE_URL);
+    const result = response.data;
+    return res.json(result);
+    
+  } catch (error) {
+    console.error("Failed to make request:", error.message);
+  }
+});
 
-  router.get("/search/:searchQuery/:pageNo", async (req, res) => {
-    try {
-      // const pageNo = req.body.pageNo;
-      const {pageNo}=req.params;
-      const PAGE_URL = "&page="+pageNo;
-      const {searchQuery} = req.params;
-      const SEARCH_QUERY_URL = "&query="+searchQuery;
-      const response = await axios.get(SEARCH_URL+SEARCH_QUERY_URL+PAGE_URL);
-      const result = response.data;
-      return res.json(result);
-      
-    } catch (error) {
-      console.error("Failed to make request:", error.message);
-    }
-  });
+router.get("/search/:searchQuery/:pageNo", async (req, res) => {
+  try {
+    // const pageNo = req.body.pageNo;
+    const {pageNo}=req.params;
+    const PAGE_URL = "&page="+pageNo;
+    const {searchQuery} = req.params;
+    const SEARCH_QUERY_URL = "&query="+searchQuery;
+    const response = await axios.get(SEARCH_URL+SEARCH_QUERY_URL+PAGE_URL);
+    const result = response.data;
+    return res.json(result);
+    
+  } catch (error) {
+    console.error("Failed to make request:", error.message);
+  }
+});
 
 router.post("/review",async(req,res)=>{
     try {
@@ -78,5 +78,6 @@ router.post("/review",async(req,res)=>{
         console.log(error.message);
         response.status(500).send({ message: error.message });
       }
-})
+});
+
 export default router;
