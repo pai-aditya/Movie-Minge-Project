@@ -1,4 +1,4 @@
-import { MoreVertical, ChevronLast, ChevronFirst } from "lucide-react"
+import { MoreVertical, ChevronLast, ChevronFirst, ArrowBigLeft,ArrowBigRight } from "lucide-react"
 import { createContext, useState } from "react"
 
 export const SidebarContext = createContext();
@@ -21,7 +21,7 @@ const Sidebar = ({ children }) => {
             onClick={() => setExpanded((curr) => !curr)}
             className="p-1.5 rounded-lg bg-white hover:bg-custom-purple"
           >
-            {expanded ? <ChevronFirst /> : <ChevronLast />}
+            {expanded ? <ArrowBigLeft /> : <ArrowBigRight />}
           </button>
         </div>
 
