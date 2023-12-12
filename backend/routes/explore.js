@@ -2,8 +2,6 @@ import express from 'express';
 import axios from "axios";
 import { API_KEY,BASE_URL } from '../config.js';
 
-const SEARCH_URL = BASE_URL;
-
 const router = express.Router();
 
 router.get("/:id", async (req,res) => {

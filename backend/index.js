@@ -7,20 +7,19 @@ import cors from "cors";
 import dotenv from 'dotenv';
 
 dotenv.config();
-
 const app = express();
-
 app.use(express.json());
-
 app.use(cors());
 
-app.get("/",(req,res)=>{
-    return res.send("Welcome to  MovieVerse");
-})
 
-
+//all the routes routes
 app.use('/home', homeRoute);
 app.use('/explore',exploreRoute);
+
+
+app.get("/",(req,res)=>{
+  return res.send("Welcome to  MovieVerse");
+});
 
 
 mongoose

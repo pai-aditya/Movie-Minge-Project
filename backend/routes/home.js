@@ -3,8 +3,6 @@ import axios from "axios";
 import mongoose from 'mongoose';
 import { API_KEY,BASE_URL } from '../config.js';
 
-const API_URL = `${BASE_URL}/discover/movie?sort_by=popularity.desc&${API_KEY}`; // Template literal
-const SEARCH_URL = `${BASE_URL}/search/movie?${API_KEY}`
 const router = express.Router();
 
 const reviewSchema = {
@@ -21,7 +19,7 @@ router.get("/:pageNo", async (req, res) => {
     // const pageNo = req.body.pageNo;
     const {pageNo}=req.params;
     const PAGE_URL = "&page="+pageNo;
-    const response = await axios.get(API_URL+PAGE_URL);
+    const response = await axios.get(`${BASE_URL}/discover/movie?sort_by=popularity.desc&${API_KEY}${PAGE_URL}`);
     const result = response.data;
     return res.json(result);
     
@@ -37,7 +35,7 @@ router.get("/search/:searchQuery/:pageNo", async (req, res) => {
     const PAGE_URL = "&page="+pageNo;
     const {searchQuery} = req.params;
     const SEARCH_QUERY_URL = "&query="+searchQuery;
-    const response = await axios.get(SEARCH_URL+SEARCH_QUERY_URL+PAGE_URL);
+    const response = await axios.get(`${BASE_URL}/search/movie?${API_KEY}${SEARCH_QUERY_URL}${PAGE_URL}`);
     const result = response.data;
     return res.json(result);
     
