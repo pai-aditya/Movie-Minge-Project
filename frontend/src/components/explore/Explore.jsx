@@ -1,9 +1,8 @@
 import axios from 'axios';
-import { useEffect,useState } from 'react';
+import { useEffect,useState,useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import Spinner from '../Spinner';
 import BackButton from "../BackButton";
-import { SERVER_URL } from '../Constants';
 
 const Explore = () => {
     const BASE_IMAGE_URL = "https://image.tmdb.org/t/p/w500";
@@ -12,34 +11,80 @@ const Explore = () => {
     const [movieCredits, setMovieCredits] = useState({cast: [],crew: []});
     const [loading, setLoading] = useState(false);
     const { id } = useParams();
+    
+    const FetchMoviesData = useCallback(async () => {
+        try{
+          const options = {
+            method: 'GET',
+            headers: {
+              accept: 'application/json',
+              Authorization: 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJiYjAxMjQ5N2E1NzE2YjVlY2RhZWU2OWFkOWNiYWQyYSIsInN1YiI6IjY1NzQ0MWM0YTFkMzMyMDExYjRlNzZiZSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.FZcJY_lm3oMI6s80W1A6nhlvXC-HMOLBF8F3FvV5990'
+            }
+          };
+            const response = await fetch(`https://api.themoviedb.org/3/movie/${id}`, options);
+            const data = await response.json();
+            console.log(data);
+            return data;
+        } catch(error){
+            console.log(error);
+            return [];
+        }
+      },[id]);
+
+      const FetchMoviesDataCredits = useCallback(async () => {
+        try{
+          const options = {
+            method: 'GET',
+            headers: {
+              accept: 'application/json',
+              Authorization: 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJiYjAxMjQ5N2E1NzE2YjVlY2RhZWU2OWFkOWNiYWQyYSIsInN1YiI6IjY1NzQ0MWM0YTFkMzMyMDExYjRlNzZiZSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.FZcJY_lm3oMI6s80W1A6nhlvXC-HMOLBF8F3FvV5990'
+            }
+          };
+            const response = await fetch(`https://api.themoviedb.org/3/movie/${id}/credits`, options);
+            const data = await response.json();
+            console.log(data);
+            return data;
+        } catch(error){
+            console.log(error);
+            return [];
+        }
+      },[id]);
+    useEffect(() => {
+        setLoading(true);
+        const fetchData = async () => {
+            try {
+              const moviesData = await FetchMoviesData();
+              setMovie(moviesData);
+              setLoading(false);
+            }
+            catch (error) {
+              console.log(error);
+              setLoading(false);
+
+              return [];
+            }
+          };
+          fetchData();
+    },[FetchMoviesData])
 
     useEffect(() => {
         setLoading(true);
-        axios
-        .get(`${SERVER_URL}/explore/${id}`)
-        .then((response) => {
-            setMovie(response.data);
-            setLoading(false);
-        })
-        .catch((error) => {
-            console.log(error);
-            setLoading(false);
-        });
+        const fetchData = async () => {
+            try {
+              const moviesData = await FetchMoviesDataCredits();
+              setMovieCredits(moviesData);
+              setLoading(false);
+            }
+            catch (error) {
+              console.log(error);
+              setLoading(false);
 
-        axios
-        .get(`${SERVER_URL}/explore/credits/${id}`)
-        .then((response) => {
-            setMovieCredits(response.data);
-            setLoading(false);
-        })
-        .catch((error) => {
-            console.log(error);
-            setLoading(false);
-        });
+              return [];
+            }
+          };
+          fetchData();
+    },[FetchMoviesDataCredits])
 
-                
-    }, []);
-    
 
     return (
         <div className='p-4 w-full'>

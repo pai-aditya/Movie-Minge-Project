@@ -1,5 +1,4 @@
-import { useState,useEffect } from 'react'
-import axios from "axios";
+import { useState,useEffect,useCallback } from 'react'
 import Spinner from '../components/Spinner';
 // import { Link } from 'react-router-dom';
 // import { AiOutlineEdit } from 'react-icons/ai';
@@ -7,7 +6,6 @@ import Spinner from '../components/Spinner';
 // import { MdOutlineAddBox } from 'react-icons/md';
 import MoviesCard from "../components/home/MoviesCard";
 import TitleCard from '../components/TitleCard';
-import { SERVER_URL } from '../components/Constants';
 
 
 const Home = () => {
@@ -19,38 +17,81 @@ const Home = () => {
     const [searchQuery, setSearchQuery] = useState('');
     // let totalPages = 100; // Assuming total number of pages is 100
     // const [showType,setShowType] = useState('card');
-
-    useEffect(() => {
-        setLoading(true);
-      if(!searchQuery){
-          
-        axios
-          .get(`${SERVER_URL}/home/${pageNo}`)
-          .then((res) => {
-            setMovies(res.data.results);
-            setTotalPages(res.data.total_pages);
-            setLoading(false);
-          })
-          .catch((err) => {
-            console.log("entering error stage brooooo"+err);
-            setLoading(false);
-          });
-        }else{
-                axios
-                .get(`${SERVER_URL}/home/search/${searchQuery}/${pageNo}`)
-                .then((res) => {
-                    setMovies(res.data.results); // Update movies state with the search results
-                    setTotalPages(res.data.total_pages); // Update total pages if needed
-                    setLoading(false); // Set loading state to false after data is fetched
-            })  
-            .catch((err) => {
-                console.log("Error occurred while searching:", err);
-                setLoading(false); // Set loading state to false in case of error
-            });
+  
+  const FetchMoviesData = useCallback(async () => {
+    try{
+      const options = {
+        method: 'GET',
+        headers: {
+          accept: 'application/json',
+          Authorization: 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJiYjAxMjQ5N2E1NzE2YjVlY2RhZWU2OWFkOWNiYWQyYSIsInN1YiI6IjY1NzQ0MWM0YTFkMzMyMDExYjRlNzZiZSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.FZcJY_lm3oMI6s80W1A6nhlvXC-HMOLBF8F3FvV5990'
         }
+      };
+        const response = await fetch(`https://api.themoviedb.org/3/discover/movie?sort_by=popularity.desc&page=${pageNo}`, options);
+        const data = await response.json();
+        console.log(data);
+        return data;
+    } catch(error){
+        console.log(error);
+        return [];
+    }
+  },[pageNo]);
 
-      }, [pageNo,totalPages,searchQuery]); 
+  const FetchMoviesDataWithSearchQuery = useCallback (async () => {
+    try{
+      const options = {
+        method: 'GET',
+        headers: {
+          accept: 'application/json',
+          Authorization: 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJiYjAxMjQ5N2E1NzE2YjVlY2RhZWU2OWFkOWNiYWQyYSIsInN1YiI6IjY1NzQ0MWM0YTFkMzMyMDExYjRlNzZiZSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.FZcJY_lm3oMI6s80W1A6nhlvXC-HMOLBF8F3FvV5990'
+        }
+      };
+        const response = await fetch(`https://api.themoviedb.org/3/search/movie?query=${searchQuery}&page=${pageNo}`, options)
+        const data = await response.json();
+        console.log(data);
+        return data;
+    } catch(error){
+        console.log(error);
+        return [];
+    }
+  },[pageNo,searchQuery]);
 
+
+
+  useEffect(() => {
+    setLoading(true);
+    if(searchQuery){
+      const fetchDataWithSearchQuery = async () => {
+      try {
+        const moviesData = await FetchMoviesDataWithSearchQuery();
+        setMovies(moviesData.results);
+        setTotalPages(moviesData.total_pages);
+        setLoading(false);
+      }
+      catch (error) {
+        console.log(error);
+        setLoading(false);
+        return [];
+      }
+    };
+    fetchDataWithSearchQuery();
+    }else{
+      const fetchData = async () => {
+        try {
+            const moviesData = await FetchMoviesData();
+            setMovies(moviesData.results);
+            setTotalPages(moviesData.total_pages);
+            setLoading(false);
+        }
+        catch (error) {
+            console.log(error);
+            setLoading(false);
+            return [];
+        }
+      };
+      fetchData();   
+    }
+  },[pageNo,totalPages,searchQuery,FetchMoviesData,FetchMoviesDataWithSearchQuery]); 
 
       const goToNextPage = () => {
         if (pageNo < totalPages) {
@@ -64,9 +105,6 @@ const Home = () => {
         }
       };
 
-      
-
-    // Existing code...
 
     const handleSearchInputChange = (event) => {
         setSearchQuery(event.target.value);
