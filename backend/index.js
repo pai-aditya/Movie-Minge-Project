@@ -60,6 +60,7 @@ const userSchema = new mongoose.Schema({
     secret: String,
     displayName:String,
     photos:String,
+    email:String
 });
 
 
@@ -85,7 +86,7 @@ passport.use(new GoogleStrategy({
   },
   function(accessToken, refreshToken, profile, callback) {
     console.log(profile);
-    User.findOrCreate({ username:profile.id, googleId: profile.id , displayName: profile.displayName, photos:profile.photos? profile.photos[0]?.value:"default_profile_photo"}, function (err, user) {
+    User.findOrCreate({ username:profile.id, googleId: profile.id , displayName: profile.displayName, photos:profile._json.picture, email:profile._json.email}, function (err, user) {
       return callback(err, user);
     });
   }
