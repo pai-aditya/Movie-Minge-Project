@@ -3,7 +3,7 @@ import { useEffect,useState } from 'react';
 import { useParams } from 'react-router-dom';
 import Spinner from '../Spinner';
 import BackButton from "../BackButton";
-import { BACKEND_API_URL } from '../Constants';
+import { SERVER_URL } from '../Constants';
 
 const Explore = () => {
     const BASE_IMAGE_URL = "https://image.tmdb.org/t/p/w500";
@@ -16,7 +16,7 @@ const Explore = () => {
     useEffect(() => {
         setLoading(true);
         axios
-        .get(`${BACKEND_API_URL}/explore/${id}`)
+        .get(`${SERVER_URL}/explore/${id}`)
         .then((response) => {
             setMovie(response.data);
             setLoading(false);
@@ -27,7 +27,7 @@ const Explore = () => {
         });
 
         axios
-        .get(`${BACKEND_API_URL}/explore/credits/${id}`)
+        .get(`${SERVER_URL}/explore/credits/${id}`)
         .then((response) => {
             setMovieCredits(response.data);
             setLoading(false);

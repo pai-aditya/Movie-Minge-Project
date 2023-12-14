@@ -1,7 +1,14 @@
 import { FcGoogle } from 'react-icons/fc';
 import { Link } from 'react-router-dom';
-
+import { SERVER_URL } from '../components/Constants';
 const Login = () => {
+  const googleAuth = () => {
+    window.open(
+      `${SERVER_URL}/auth/google`,
+      "_self"
+    );
+  };
+
   return (
     <div className="relative w-full h-screen bg-custom-primary-purple">
       <div className="flex justify-center items-center h-full">
@@ -40,9 +47,9 @@ const Login = () => {
           </button>
           {/* Google login button */}
           <div className="flex justify-center py-4">
-            <p className="px-6 py-2 relative flex items-center rounded-lg shadow-lg hover:shadow-xl bg-indigo-600 text-white">
-              <FcGoogle className="mr-2" size={20} /> Google
-            </p>
+            <button type="button" onClick={googleAuth} className="px-6 py-2 relative flex items-center rounded-lg shadow-lg hover:shadow-xl bg-indigo-600 text-white">
+              Sign in with  <FcGoogle className="ml-4 mr-1" size={20} />Google
+            </button>
           </div>
           {/* Register button with centered text */}
           <div className="flex justify-center py-4">

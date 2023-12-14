@@ -3,7 +3,7 @@ import { createContext, useState } from "react"
 
 export const SidebarContext = createContext();
 
-const Sidebar = ({ children }) => {
+const Sidebar = ({ children ,user} ) => {
   const [expanded, setExpanded] = useState(false)
   
   return (
@@ -31,7 +31,7 @@ const Sidebar = ({ children }) => {
 
         <div className="border-t flex p-3">
           <img
-            src="https://ui-avatars.com/api/?background=c7d2fe&color=3730a3&bold=true"
+            src={user?user.user.photos: "https://ui-avatars.com/api/?background=c7d2fe&color=3730a3&bold=true"}
             alt=""
             className="w-10 h-10 rounded-md"
           />
@@ -42,8 +42,8 @@ const Sidebar = ({ children }) => {
           `}
           >
             <div className="leading-4">
-              <h4 className="font-semibold text-white">Aditya Pai</h4>
-              <span className="text-xs text-white">sample@gmail.com</span>
+              <p className="font-semibold text-white">{user? user.user.displayName : "sample name"}</p>
+              <span className="text-xs text-white">{user?  (user.user.username? user.user.username:"sample.com") : "sample@gmail.com"}</span>
             </div>
             <MoreVertical size={20} />
           </div>

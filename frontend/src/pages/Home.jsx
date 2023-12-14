@@ -7,7 +7,7 @@ import Spinner from '../components/Spinner';
 // import { MdOutlineAddBox } from 'react-icons/md';
 import MoviesCard from "../components/home/MoviesCard";
 import TitleCard from '../components/TitleCard';
-import { BACKEND_API_URL } from '../components/Constants';
+import { SERVER_URL } from '../components/Constants';
 
 
 const Home = () => {
@@ -25,7 +25,7 @@ const Home = () => {
       if(!searchQuery){
           
         axios
-          .get(`${BACKEND_API_URL}/home/${pageNo}`)
+          .get(`${SERVER_URL}/home/${pageNo}`)
           .then((res) => {
             setMovies(res.data.results);
             setTotalPages(res.data.total_pages);
@@ -37,7 +37,7 @@ const Home = () => {
           });
         }else{
                 axios
-                .get(`${BACKEND_API_URL}/home/search/${searchQuery}/${pageNo}`)
+                .get(`${SERVER_URL}/home/search/${searchQuery}/${pageNo}`)
                 .then((res) => {
                     setMovies(res.data.results); // Update movies state with the search results
                     setTotalPages(res.data.total_pages); // Update total pages if needed
@@ -50,6 +50,51 @@ const Home = () => {
         }
 
       }, [pageNo,totalPages,searchQuery]); 
+
+
+
+
+    useEffect(() => {
+        setLoading(true);
+      if(!searchQuery){
+          
+        axios
+          .get(`${SERVER_URL}/home/${pageNo}`)
+          .then((res) => {
+            setMovies(res.data.results);
+            setTotalPages(res.data.total_pages);
+            setLoading(false);
+          })
+          .catch((err) => {
+            console.log("entering error stage brooooo"+err);
+            setLoading(false);
+          });
+        }else{
+                axios
+                .get(`${SERVER_URL}/home/search/${searchQuery}/${pageNo}`)
+                .then((res) => {
+                    setMovies(res.data.results); // Update movies state with the search results
+                    setTotalPages(res.data.total_pages); // Update total pages if needed
+                    setLoading(false); // Set loading state to false after data is fetched
+            })  
+            .catch((err) => {
+                console.log("Error occurred while searching:", err);
+                setLoading(false); // Set loading state to false in case of error
+            });
+        }
+
+      }, [pageNo,totalPages,searchQuery]);   
+
+
+
+
+
+
+
+
+
+
+
 
 
       const goToNextPage = () => {

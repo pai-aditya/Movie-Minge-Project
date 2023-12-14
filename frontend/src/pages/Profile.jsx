@@ -1,6 +1,8 @@
-const Profile = () => {
+const Profile = (userDetails) => {
   return (
-    <div>Profile</div>
+    <div>
+    Hey,  {userDetails.user.user.displayName}!
+    </div>
   )
 }
 
