@@ -51,7 +51,7 @@ app.use('/home', homeRoute);
 app.use('/explore',exploreRoute);
 
 
-mongoose.connect('mongodb+srv://pai:ad9tad9t@cluster0.8vt0ak0.mongodb.net/SecurityDB2');
+mongoose.connect(process.env.MONGO_CONNECTION);
 
 const userSchema = new mongoose.Schema({
     email: String,
