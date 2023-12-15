@@ -51,7 +51,17 @@ app.use('/home', homeRoute);
 app.use('/explore',exploreRoute);
 
 
-mongoose.connect(process.env.MONGO_CONNECTION);
+mongoose
+  .connect(process.env.MONGO_CONNECTION)
+  .then(() => {
+    console.log('App connected to database');
+    app.listen(PORT, () => {
+      console.log(`App is listening to port: ${PORT}`);
+    });
+  })
+  .catch((error) => {
+    console.log(error);
+  });
 
 const userSchema = new mongoose.Schema({
     email: String,
@@ -190,18 +200,4 @@ app.get("/",(req,res)=>{
   return res.send("Welcome to  MovieVerse");
 });
 
-app.listen(PORT, () => {
-  console.log(`App is listening to port: ${PORT}`);
-});
 
-// mongoose
-//   .connect(process.env.MONGO_CONNECTION)
-//   .then(() => {
-//     console.log('App connected to database');
-//     app.listen(PORT, () => {
-//       console.log(`App is listening to port: ${PORT}`);
-//     });
-//   })
-//   .catch((error) => {
-//     console.log(error);
-//   });
