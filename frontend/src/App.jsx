@@ -1,4 +1,4 @@
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, useLocation } from 'react-router-dom';
 
 import Home from './pages/Home';
 import Lists from './pages/Lists';
@@ -11,26 +11,42 @@ import Help from './pages/Help';
 import Profile from './pages/Profile';
 import Register from './pages/Register';
 import Logout from './pages/Logout';
+import Success from './pages/Success';
+import ReviewMovie from './pages/ReviewMovie';
 import { SERVER_URL } from './components/Constants';
 import { useState,useEffect } from 'react';
-import axios from "axios";
-// import { Navigate } from 'react-router-dom';
 
 
-import Sidebar from './components/Sidebar'; // Import your Sidebar component
+import Sidebar from './components/Sidebar';
 import SidebarItem from './components/SidebarItem';
 import {Home as HomeIcon,User,Settings,LifeBuoy,Users, BookText, List,ListChecks,LogIn,LogOut} from "lucide-react";
-import Spinner from './components/Spinner';
+
+
+export const FetchUserData = async () => {
+  try{
+    const response = await fetch(`${SERVER_URL}/auth/check`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        credentials:"include",
+    });
+    const data = await response.json();
+    if (data.message === "Unauthorized") {
+      console.log("User has not logged in");
+      return null;
+    }
+
+    console.log("Data from fetch user:", JSON.stringify(data));
+    return data;
+} catch(error){
+    console.log(error);
+    return null;
+  }
+};
 
 const App = () => {
-  axios.defaults.withCredentials = true;
 
-  // const logout = () => {
-  //   window.open(
-  //     `${SERVER_URL}/auth/logout`,
-  //     "_self"
-  //   );
-  // };
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(false);
   const [showLoginButton, setShowLoginButton] = useState(true);
@@ -45,20 +61,40 @@ const App = () => {
 	
   useEffect(() => {
     setLoading(true);
-      
-    axios
-      .get(`${SERVER_URL}/auth/test`)
-      .then((res) => {
-        setUser(res.data);
-        console.log(JSON.stringify(res.data));
+    const fetchData = async () => {
+      try{
+        const userData = await FetchUserData();
+        setUser(userData);
         setLoading(false);
-        // setState(true);
-      })
-      .catch((err) => {
-        console.log("entering error stage brooooo"+err);
+      }catch(err){
+        console.log(err);
         setLoading(false);
-        // setState(false);
-      });
+      }
+    };
+    fetchData();
+    
+      // fetch(`${SERVER_URL}/auth/check`,{
+      //   credentials:"include"
+      // })
+      //   .then(response => {
+      //     return response.json();
+      //   })
+      //   .then(data => {
+      //     if(data.message==="Unauthorized"){
+      //       console.log("user has not logged in");
+      //       setLoading(false);
+      //     }else{
+      //       setUser(data);
+      //       console.log("data from fetch user "+JSON.stringify(data));
+      //       setLoading(false);
+      //     }
+          
+      //   })
+      //   .catch(err => {
+      //     console.log(err);
+      //     setLoading(false);
+      //   })
+
 
   },[]); 
 
@@ -73,31 +109,33 @@ const App = () => {
         ) :
         (
           <div>
-          <SidebarItem icon={<User        size={20} />} text="Your Profile" link="/profile" />
-        <SidebarItem icon={<BookText    size={20} />} text="Your Reviews" link="/yourreviews" />
-        <SidebarItem icon={<List        size={20}      />} text="Your Lists" link="/yourlists"/>
-        <SidebarItem icon={<Users       size={20}     />} text="MovieVerse Community" link="/community"/>
-        <SidebarItem icon={<ListChecks  size={20}/>} text="Your Watchlist" link="/yourwatchlist"/>
-          <SidebarItem icon={<LogOut       size={20}   />} text="Logout" link="/logout"/>
+            <SidebarItem icon={<User        size={20} />} text="Your Profile"         link="/profile" />
+            <SidebarItem icon={<BookText    size={20} />} text="Your Reviews"         link="/yourreviews" />
+            <SidebarItem icon={<List        size={20} />} text="Your Lists"           link="/yourlists"/>
+            <SidebarItem icon={<Users       size={20} />} text="MovieVerse Community" link="/community"/>
+            <SidebarItem icon={<ListChecks  size={20} />} text="Your Watchlist"       link="/yourwatchlist"/>
+            <SidebarItem icon={<LogOut      size={20} />} text="Logout"               link="/logout"/>
           </div>
         )}
         
-        <SidebarItem icon={<Settings size={20} />} text="Settings" link="/yourreviews"/>
-        <SidebarItem icon={<LifeBuoy size={20} />} text="Help" link="/help"/>
+        <SidebarItem icon={<Settings size={20} />} text="Settings"  link="/yourreviews"/>
+        <SidebarItem icon={<LifeBuoy size={20} />} text="Help"      link="/help"/>
       </Sidebar>
 
       <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/explore/:id" element={<Explore />} />
-        <Route path="/yourreviews" element={user ? <Reviews user={user} /> : <Login />}/>
-        <Route path="/yourlists" element={user ? <Lists user={user} /> : <Login />}/>
-        <Route path="/community" element={user ? <Community user={user} /> : <Login />}/>
-        <Route path="/yourwatchlist" element={user ? <Watchlist user={user} /> : <Login />}/>
-        <Route path="/profile" element={user ? <Profile user={user} /> : <Login />}/>
-        <Route path="/login" element={<Login />} />
-        <Route path="/help" element={<Help />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/logout" element={<Logout />} />
+        <Route path="/"               element={<Home />} />
+        <Route path="/explore/:id"    element={<Explore />} />
+        <Route path="/yourreviews"    element={user ? <Reviews     user={user} /> : <Login />}/>
+        <Route path="/yourlists"      element={user ? <Lists       user={user} /> : <Login />}/>
+        <Route path="/community"      element={user ? <Community   user={user} /> : <Login />}/>
+        <Route path="/yourwatchlist"  element={user ? <Watchlist   user={user} /> : <Login />}/>
+        <Route path="/profile"        element={user ? <Profile     user={user} /> : <Login />}/>
+        <Route path="/reviewMovie/:id"    element={user ? <ReviewMovie user={user} /> : <Login />}/>
+        <Route path="/login"          element={<Login />} />
+        <Route path="/help"           element={<Help />} />
+        <Route path="/register"       element={<Register />} />
+        <Route path="/logout"         element={<Logout />} />
+        <Route path="/success"        element={<Success />} />
       </Routes>
     </div>
   );

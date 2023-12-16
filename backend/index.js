@@ -18,16 +18,11 @@ import findOrCreate from "mongoose-findorcreate";
 dotenv.config();
 const app = express();
 app.use(express.json());
-app.use(cors());
-app.use(express.urlencoded({extended: true}));
-
-
 app.use(cors({
   origin: `${process.env.CLIENT_URL}`,
   credentials: true,
 }));
-
-
+app.use(express.urlencoded({extended: true}));
 
 app.use(session({
   secret: "TheMovieVerseProject",
@@ -35,15 +30,9 @@ app.use(session({
   saveUninitialized: false
 }));
 
+
 app.use(passport.initialize());
 app.use(passport.session());
-
-// app.use(function(req, res, next) {
-//   res.header('Access-Control-Allow-Origin', `${process.env.CLIENT_URL}`);
-//   res.header('Access-Control-Allow-Credentials', true);
-//   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
-//   next();
-// });
 
 
 //all the routes
@@ -56,12 +45,21 @@ mongoose
   .then(() => {
     console.log('App connected to database');
     app.listen(PORT, () => {
-      console.log(`App is listening to port: ${PORT}`);
+      console.log(`App is listening to port: ${PORT} at ${new Date()}`);
     });
   })
   .catch((error) => {
     console.log(error);
   });
+
+
+const reviewSchema = new mongoose.Schema({
+  movieID : Number,
+  rating: Number,
+  reviewBody: String,
+  movieTitle: String
+});
+const Review = new mongoose.model("Review",reviewSchema);
 
 const userSchema = new mongoose.Schema({
     email: String,
@@ -69,12 +67,14 @@ const userSchema = new mongoose.Schema({
     googleId: String,
     secret: String,
     displayName:String,
-    photos: String
+    photos: String,
+    reviews: [reviewSchema]
 });
 
 
 userSchema.plugin(passportLocalMongoose);
 userSchema.plugin(findOrCreate);
+
 
 const User = new mongoose.model("User",userSchema);
 
@@ -101,20 +101,18 @@ passport.use(new GoogleStrategy({
   }
 ));
 
-
 app.get("/auth/google",
     passport.authenticate("google", {scope:["profile","email"]})
 );
 
 
-
 app.get("/auth/google/callback", 
   passport.authenticate("google", { failureRedirect: "/auth/login/failed" }),
   function(req, res) {
-    // Successful authentication, redirect home.
     return res.redirect(`${process.env.CLIENT_URL}/profile`);
   }
 );
+
 app.get("/auth/login/failed", (req, res) => {
 	res.status(401).json({
 		error: true,
@@ -132,23 +130,25 @@ app.get("/auth/logout",function(req,res){
 });
 
 
-//NOT USED
 app.post("/register",function(req,res){
-  User.register({username: req.body.username}, req.body.password, function(err, user){
+  console.log("entering register api with username: "+req.body.username+" password: "+req.body.password+" with the displayName: "+req.body.displayName);
+  User.register({username: req.body.username, displayName: req.body.displayName}, req.body.password, function(err, user){
       if (err) {
         console.log(err);
-        return res.send({"there is some error":err.message})
+        res.status(500).json({ success: false, message: "Registration failed" });
+
       } else {
         passport.authenticate("local")(req, res, function(){
-          return res.send({"success":`the user has been succesfully registered with username=${req.body.username} and password=${req.body.password}`});
+          console.log("entering yesssss")
+          res.status(200).json({ success: true, message: "Registration successful" });
         });
       }
     });
 });
 
 
-//TODO: NOT USED
 app.post("/login",function(req,res){
+  console.log("entering register api with username: "+req.body.username+" password: "+req.body.password);
   const user = new User({
       username: req.body.username,
       password: req.body.password
@@ -157,16 +157,48 @@ app.post("/login",function(req,res){
     req.login(user, function(err){
       if (err) {
         console.log(err);
-        return res.send({"failure":`the user has been not been logged in with username=${req.body.username} and password=${req.body.password}`});
+        res.status(500).json({ success: false, message: "Login failed" });
       } else {
         passport.authenticate("local")(req, res, function(){
-          return res.send({"success":`the user has been succesfully logged in with username=${req.body.username} and password=${req.body.password}`});
+          res.status(200).json({ success: true, message: "Registration successful" });
         });
       }
     });
 });
 
+app.post("/submit/review",function(req,res){
+  const submittedMovieID = req.body.id;
+  const submittedRating = req.body.rating;
+  const submittedReviewBody = req.body.reviewBody;
+  const submittedMovieTitle = req.body.movieTitle;
 
+  const submittedReview = new Review({
+    movieID: submittedMovieID,
+    rating: submittedRating,
+    reviewBody: submittedReviewBody,
+    movieTitle: submittedMovieTitle
+  });
+  console.log("tesyt why not working"+JSON.stringify(req.user));
+  User.findById(req.user._id)
+      .then(function(foundUser){
+          if(foundUser){
+            foundUser.reviews.push(submittedReview);
+            
+            foundUser.save()
+              .then(function(){
+                res.status(200).json({ success: true, message: "Review saved successfully" });
+              })
+              .catch(function(err){
+                res.status(500).json({ success: false, message: "Review cannot be saved, something went wrong" });
+              })
+          }
+      })
+      .catch(function(err){
+        res.status(200).json({ success: false, message: "Review failed" });
+      })
+    
+
+});
 
 //TODO
 // app.get("/auth/login/success", (req, res) => {
@@ -184,20 +216,41 @@ app.post("/login",function(req,res){
 // });
 
 
-
-app.get("/auth/test", (req,res) => {
+app.get("/auth/check", (req,res) => {
   if (req.isAuthenticated()) {
     // Access the user's data from req.user
+    console.log(JSON.stringify(req.user));
     res.json({ user: req.user });
   } else {
-    console.log("enterint thissdfkhndsfiouh")
+    console.log(`entering not authenticated phase at ${new Date()}`);
+    res.status(401).json({ message: "Unauthorized" });
+  }
+});
+
+app.get("/getreviews", (req, res) => {
+  if (req.isAuthenticated()) {
+    User.findById(req.user._id)
+      .populate("reviews") // Populate the 'reviews' field in the User model
+      .exec()
+      .then((user) => {
+        if (user) {
+          const userReviews = user.reviews;
+          res.status(200).json({ reviews: userReviews });
+        } else {
+          res.status(404).json({ message: "User not found" });
+        }
+      })
+      .catch((err) => {
+        console.error("Error fetching user reviews:", err);
+        res.status(500).json({ message: "Internal server error" });
+      });
+  } else {
     res.status(401).json({ message: "Unauthorized" });
   }
 });
 
 
+
 app.get("/",(req,res)=>{
   return res.send("Welcome to  MovieVerse");
 });
-
-

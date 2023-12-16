@@ -31,7 +31,7 @@ const Sidebar = ({ children ,user} ) => {
 
         <div className="border-t flex p-3">
           <img
-            src={user?user.user.photos: "https://ui-avatars.com/api/?background=c7d2fe&color=3730a3&bold=true"}
+            src={user && user.user && user.user.photos ? user.user.photos: "../../profile.png"}
             alt=""
             className="w-10 h-10 rounded-md"
           />
@@ -42,10 +42,10 @@ const Sidebar = ({ children ,user} ) => {
           `}
           >
             <div className="leading-4">
-              <p className="font-semibold text-white">{user? user.user.displayName : "sample name"}</p>
-              <span className="text-xs text-white">{user?  (user.user.username? user.user.username:"sample.com") : "sample@gmail.com"}</span>
+              <p className="font-semibold text-white">{user && user.user ? user.user.displayName : "Login Now!!!"}</p>
+              <span className="text-xs text-white">{user && user.user && user.user.username ? user.user.username : ""}</span>
             </div>
-            <MoreVertical size={20} />
+            {/* <MoreVertical size={20} /> */}
           </div>
         </div>
       </nav>

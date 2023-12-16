@@ -1,7 +1,15 @@
 import { FcGoogle } from 'react-icons/fc';
-import { Link } from 'react-router-dom';
+import { Link,useNavigate } from 'react-router-dom';
+import { useState } from 'react';
 import { SERVER_URL } from '../components/Constants';
+import Spinner from '../components/Spinner';
+
 const Login = () => {
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const navigateTo  = useNavigate ();
+
   const googleAuth = () => {
     window.open(
       `${SERVER_URL}/auth/google`,
@@ -9,10 +17,48 @@ const Login = () => {
     );
   };
 
+  const handleLogin = async (e) => {
+    setLoading(true);
+    e.preventDefault();
+
+    try {
+      const response = await fetch(`${SERVER_URL}/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username, password }),
+        credentials: 'include',
+      });
+
+      const data = await response.json();
+
+      console.log('Login response:', data);
+      if (data.success) {
+        console.log("entering login success rout from the UI")
+        setLoading(false);
+        // navigateTo("/success");
+        navigateTo(0);
+        // navigateTo("/profile");
+      } else {
+        setLoading(false);
+        console.error('Registration failed:', data.message);
+      }
+    } catch (error) {
+      setLoading(false);
+      console.error('Registration failed:', error.message);
+    }
+  };
+
   return (
     <div className="relative w-full h-screen bg-custom-primary-purple">
+      {loading ? (
+      <Spinner />
+    ) : (
+    
+    <div className="h-screen">
       <div className="flex justify-center items-center h-full">
-        <form className="max-w-[400px] w-full mx-auto p-8 rounded-lg bg-gray-800 text-white border-4 border-custom-gold">
+        <form className="max-w-[400px] w-full mx-auto p-8 rounded-lg bg-gray-800 text-white border-4 border-custom-gold" onSubmit={handleLogin}>
           {/* Welcome text */}
           <div className="text-center text-2xl font-bold text-gray-200 mb-4">
             Welcome Back!
@@ -30,6 +76,8 @@ const Login = () => {
               id="username"
               className="border rounded-lg relative bg-gray-700 p-2 focus:outline-none focus:ring-2 focus:ring-indigo-600 text-white"
               type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
             />
           </div>
           <div className="flex flex-col">
@@ -40,9 +88,11 @@ const Login = () => {
               id="password"
               className="border rounded-lg relative bg-gray-700 p-2 focus:outline-none focus:ring-2 focus:ring-indigo-600 text-white"
               type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
             />
           </div>
-          <button className="w-full py-3 mt-8 bg-indigo-600 hover:bg-indigo-500 relative text-white rounded-lg">
+          <button className="w-full py-3 mt-8 bg-indigo-600 hover:bg-indigo-500 relative text-white rounded-lg" type="submit">
             Sign In
           </button>
           {/* Google login button */}
@@ -64,6 +114,8 @@ const Login = () => {
           </div>
         </form>
       </div>
+    </div>
+    )}
     </div>
   );
 };

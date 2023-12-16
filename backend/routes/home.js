@@ -5,15 +5,6 @@ import { API_KEY,BASE_URL } from '../config.js';
 
 const router = express.Router();
 
-const reviewSchema = {
-  movieTitle: String,
-  movieID: String,
-  rating: Number,
-  reviewBody: String
-}
-
-const Review = mongoose.model("Review",reviewSchema);
-
 router.get("/:pageNo", async (req, res) => {
   try {
     // const pageNo = req.body.pageNo;
@@ -44,38 +35,38 @@ router.get("/search/:searchQuery/:pageNo", async (req, res) => {
   }
 });
 
-router.post("/review",async(req,res)=>{
-    try {
-        if (
-          !req.body.movieTitle ||
-          !req.body.movieID ||
-          !req.body.rating ||
-          !req.body.reviewBody
-        ) {
-          return res.status(400).send({
-            message: 'Send all required fields: title, author, publishYear',
-          });
-        }
-        // const newReview ={
-        //     movieTitle: "Kabir Singh",
-        //     movieID: "movieID",
-        //     rating: "3.5",
-        //     reviewBody: "This is my review"
-        // }
-        const newReview ={
-            movieTitle: req.body.movieTitle,
-            movieID: req.body.movieID,
-            rating: req.body.rating,
-            reviewBody: req.body.reviewBody
-        }
+// router.post("/review",async(req,res)=>{
+//     try {
+//         if (
+//           !req.body.movieTitle ||
+//           !req.body.movieID ||
+//           !req.body.rating ||
+//           !req.body.reviewBody
+//         ) {
+//           return res.status(400).send({
+//             message: 'Send all required fields: title, author, publishYear',
+//           });
+//         }
+//         // const newReview ={
+//         //     movieTitle: "Kabir Singh",
+//         //     movieID: "movieID",
+//         //     rating: "3.5",
+//         //     reviewBody: "This is my review"
+//         // }
+//         const newReview ={
+//             movieTitle: req.body.movieTitle,
+//             movieID: req.body.movieID,
+//             rating: req.body.rating,
+//             reviewBody: req.body.reviewBody
+//         }
     
-        const review = await Review.create(newReview);
+//         const review = await Review.create(newReview);
     
-        return res.status(201).send(review);
-      } catch (error) {
-        console.log(error.message);
-        response.status(500).send({ message: error.message });
-      }
-});
+//         return res.status(201).send(review);
+//       } catch (error) {
+//         console.log(error.message);
+//         response.status(500).send({ message: error.message });
+//       }
+// });
 
 export default router;

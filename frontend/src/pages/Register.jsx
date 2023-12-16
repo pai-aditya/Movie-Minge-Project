@@ -1,11 +1,66 @@
 import { FcGoogle } from 'react-icons/fc';
-import { Link } from 'react-router-dom';
-
+import {Link,useNavigate  } from 'react-router-dom';
+import { useState } from 'react';
+import { SERVER_URL } from '../components/Constants';
+import Spinner from '../components/Spinner';
 const Register = () => {
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [displayName, setDisplayName] = useState('');
+  const [loading, setLoading] = useState(false);
+  const navigateTo  = useNavigate ();
+  
+
+  const googleAuth = () => {
+    window.open(
+      `${SERVER_URL}/auth/google`,
+      "_self"
+    );
+  };
+
+  const handleRegister = async (e) => {
+    setLoading(true);
+    e.preventDefault();
+
+    try {
+      const response = await fetch(`${SERVER_URL}/register`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username, displayName,password }),
+        credentials: 'include',
+      });
+
+      const data = await response.json();
+
+      console.log('Registration response:', data);
+      if (data.success) {
+        console.log("entering registration success rout from the UI")
+        setLoading(false);
+        navigateTo(0);
+        // navigateTo("/profile");
+        
+      } else {
+        setLoading(false);
+        console.error('Registration failed:', data.message);
+      }
+    } catch (error) {
+      setLoading(false);
+      console.error('Registration failed:', error.message);
+    }
+  };
+  
+
   return (
     <div className="relative w-full h-screen bg-custom-primary-purple">
+    {loading ? (
+      <Spinner />
+    ) : (
+    
+    <div className="h-screen">
       <div className="flex justify-center items-center h-full">
-        <form className="max-w-[400px] w-full mx-auto p-8 rounded-lg bg-gray-800 text-white border-4 border-custom-gold">
+        <form className="max-w-[400px] w-full mx-auto p-8 rounded-lg bg-gray-800 text-white border-4 border-custom-gold" onSubmit={handleRegister}>
           {/* Welcome text */}
           <div className="text-center text-2xl font-bold text-gray-200 mb-4">
             Join Us!
@@ -14,7 +69,19 @@ const Register = () => {
             className="text-4xl font-bold text-center py-4 text-white"
             src="../../logo.svg"
           />
-          {/* Username and password fields */}
+          {/* DisplayName Username and password fields */}
+          <div className="flex flex-col mb-4">
+            <label htmlFor="name" className="text-sm text-gray-200">
+              Name
+            </label>
+            <input
+              id="name"
+              className="border rounded-lg relative bg-gray-700 p-2 focus:outline-none focus:ring-2 focus:ring-indigo-600 text-white"
+              type="text"
+              value={displayName}
+              onChange={(e) => setDisplayName(e.target.value)}
+            />
+          </div>
           <div className="flex flex-col mb-4">
             <label htmlFor="username" className="text-sm text-gray-200">
               Username
@@ -23,6 +90,8 @@ const Register = () => {
               id="username"
               className="border rounded-lg relative bg-gray-700 p-2 focus:outline-none focus:ring-2 focus:ring-indigo-600 text-white"
               type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
             />
           </div>
           <div className="flex flex-col">
@@ -33,19 +102,26 @@ const Register = () => {
               id="password"
               className="border rounded-lg relative bg-gray-700 p-2 focus:outline-none focus:ring-2 focus:ring-indigo-600 text-white"
               type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
             />
           </div>
-          <button className="w-full py-3 mt-8 bg-indigo-600 hover:bg-indigo-500 relative text-white rounded-lg">
+          {/* <Link to="/profile" > */}
+          <button className="w-full py-3 mt-8 bg-indigo-600 hover:bg-indigo-500 relative text-white rounded-lg" type="submit">
             Register
           </button>
+          {/* </Link> */}
           {/* Google login button */}
           <div className="flex justify-center py-8">
-            <p className="px-6 py-2 relative flex items-center rounded-lg shadow-lg hover:shadow-xl bg-indigo-600 text-white">
+            <button type="button"  onClick={googleAuth} className="px-6 py-2 relative flex items-center rounded-lg shadow-lg hover:shadow-xl bg-indigo-600 text-white">
               <FcGoogle className="mr-2" size={20} /> Google
-            </p>
+            </button>
           </div>
         </form>
       </div>
+    </div>
+    
+    )}
     </div>
   );
 };

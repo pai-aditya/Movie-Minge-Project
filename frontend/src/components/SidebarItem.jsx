@@ -3,7 +3,7 @@ import {SidebarContext} from "./Sidebar";
 import { Link } from 'react-router-dom'
 
 
-const SidebarItem = ({ icon, text, active, alert, link }) => {
+const SidebarItem = ({ icon, text, link }) => {
     const { expanded } = useContext(SidebarContext)
     
     return (
@@ -14,9 +14,7 @@ const SidebarItem = ({ icon, text, active, alert, link }) => {
               font-medium rounded-md cursor-pointer
               transition-colors group fill-current text-white
               ${
-                  active
-                  ? "bg-gradient-to-tr from-indigo-200 to-indigo-100 text-indigo-800"
-                  : "hover:bg-custom-primary-purple text-gray-600"
+                  "hover:bg-custom-primary-purple text-gray-600"
               }
           `}
           >
@@ -29,13 +27,6 @@ const SidebarItem = ({ icon, text, active, alert, link }) => {
           >
             {text}
           </span>
-          {alert && (
-            <div
-              className={`absolute right-2 w-2 h-2 rounded bg-indigo-400 ${
-                expanded ? "" : "top-2"
-              }`}
-            />
-          )}
     
           {!expanded && (
             <div
