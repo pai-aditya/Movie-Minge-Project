@@ -17,7 +17,7 @@ const Register = () => {
       "_self"
     );
   };
-
+  
   const handleRegister = async (e) => {
     setLoading(true);
     e.preventDefault();

@@ -2,23 +2,101 @@ import { useEffect,useState,useCallback } from 'react';
 import { Link,useNavigate,useParams } from 'react-router-dom';
 import Spinner from '../Spinner';
 import BackButton from "../BackButton";
+import { SERVER_URL } from '../Constants';
+import { FetchUserData } from '../../App';
 
 const Explore = () => {
-    // const navigateTo = useNavigate();
     const BASE_IMAGE_URL = "https://image.tmdb.org/t/p/w500";
-    
+    const navigateTo = useNavigate();
     const [movie, setMovie] = useState({genres: []});
     const [movieCredits, setMovieCredits] = useState({cast: [],crew: []});
+    const [user,setUser] = useState(null);
     const [loading, setLoading] = useState(false);
+    const addWatchlistButtonText = "Add to Watchlist";
+    const removeWatchlistButtonText = "Remove from Watchlist";
+    const [watchlistButtonText, setWatchlistButtonText] = useState(addWatchlistButtonText);
     const { id } = useParams();
 
-    // const handleReviewClick = () => {
-    //     navigateTo.push({
-    //         pathname: '/reviewMovie',
-    //         state: { movieId: id } // Pass movieId as state
-    //     });
-    // };
+    const handleWatchlist = async (e) => {
+      setLoading(true);
+      e.preventDefault();
+      const movieTitle = movie.title;
+      if(watchlistButtonText===removeWatchlistButtonText){
+        try {
+          const response = await fetch(`${SERVER_URL}/watchlist/delete/${id}`, {
+              method: 'DELETE',
+              headers: {
+              'Content-Type': 'application/json',
+              },
+              credentials: 'include',
+          });
+
+        const data = await response.json();
+            
+        console.log('Deletion response:', data);
+        if (data.success) {
+            setLoading(false);
+            // onClose();
+            navigateTo(0);
+            // navigateTo("/profile");
+            
+        } else {
+            setLoading(false);
+            console.error('Deletion failed:', data.message);
+        }
+        } catch (error) {
+        setLoading(false);
+        console.error('Deletion failed:', error.message);
+        }
+      }else{
+        try {
+          const response = await fetch(`${SERVER_URL}/watchlist/addMovie`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ id,movieTitle }),
+            credentials: 'include',
+          });
     
+          const data = await response.json();
+    
+          console.log('Watchlist response:', data);
+          if (data.success) {
+            setLoading(false);
+            navigateTo(0);
+            // navigateTo("/profile");
+            
+          } else {
+            setLoading(false);
+            console.error('Registration failed:', data.message);
+          }
+        } catch (error) {
+          setLoading(false);
+          console.error('Registration failed:', error.message);
+        }
+      }
+      
+    };
+    
+    const FetchWatchlistData = useCallback(async () => {
+      try{
+          const options = {
+              method: 'GET',
+              credentials:'include',
+              headers: {
+                  accept: 'application/json',
+              }
+          };
+          const response = await fetch(`${SERVER_URL}/watchlist/${id}`, options);
+          const data = await response.json();
+          return data;
+      } catch(error){
+          console.log(error);
+          return [];
+      }
+    },[id]);
+
     const FetchMoviesData = useCallback(async () => {
         try{
           const options = {
@@ -56,6 +134,22 @@ const Explore = () => {
             return [];
         }
       },[id]);
+
+    useEffect(() => {
+        setLoading(true);
+        const fetchData = async () => {
+        try{
+            const userData = await FetchUserData();
+            setUser(userData);
+            setLoading(false);
+        }catch(err){
+            console.log(err);
+            setLoading(false);
+        }
+        };
+        fetchData();
+    },[])
+
     useEffect(() => {
         setLoading(true);
         const fetchData = async () => {
@@ -92,85 +186,96 @@ const Explore = () => {
           fetchData();
     },[FetchMoviesDataCredits])
 
+    useEffect(() => {
+      setLoading(true);
+      const fetchWatchlistData = async () => {
+          try {
+            const reviewData = await FetchWatchlistData();
+            console.log("review data recieved"+JSON.stringify(reviewData))
+            if(!reviewData.error && reviewData.success){
+              setWatchlistButtonText(removeWatchlistButtonText);
+            }
+            setLoading(false);
+          }
+          catch (error) {
+            console.log(error);
+            setLoading(false);
+            return [];
+          }
+        };
+        fetchWatchlistData();
+  },[FetchWatchlistData])
 
     return (
-        <div className='p-4 w-full'>
+        <div className="p-4 w-full ">
             <BackButton />
-            <h1 className='text-3xl my-4'>Movie Info</h1>
+            <h1 className="text-3xl my-4">Movie Info</h1>
             {loading ? (
                 <Spinner />
             ) : (
-                <div className='flex flex-col border-2 border-sky-400 rounded-xl w-fit p-4'>
-                    <div className='my-4'>
-                        <span className='text-xl mr-4 text-gray-500'>Id</span>
-                        <span>{movie.id}</span>
-                    </div>
-                    <img className="w-full h-full object-cover" src={BASE_IMAGE_URL+movie.backdrop_path} alt={movie.title} />
-
-                    <div className='my-4'>
-                        <span className='text-xl mr-4 text-gray-500'>Title</span>
-                        <span>{movie.title}</span>
-                    </div>
-                    <div className='my-4'>
-                        <span className='text-xl mr-4 text-gray-500'>Release Date</span>
-                        <span>{movie.release_date}</span>
-                    </div>
-                    <div className='my-4'>
-                        <span className='text-xl mr-4 text-gray-500'>Runtime</span>
-                        <span>{movie.runtime} minutes</span>
-                    </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full ">
                     
-
-                    <div className="my-4">
-                        <span className="text-xl mr-4 text-gray-500">Genres</span>
-                        {movie.genres && movie.genres.map((genre, index) => {
-                            const isLastGenre = index === movie.genres.length - 1;
-                            return (
-                                <span key={genre.id}>
-                                {genre.name}
-                                {!isLastGenre && ", "}
-                                </span>
-                            );
-                        })}
-                    </div>
-
-
-
-                    {/* Display Top 3 Cast Members */}
-                    <div className='my-4'>
-                        <span className='text-xl mr-4 text-gray-500'>Top 3 Cast Members</span>
-                    <div>
-                    {/* Assuming you want the top 3 cast members */}
-                        {movieCredits.cast && movieCredits.cast.slice(0, 3).map((castMember, index) => (
-                            <span key={castMember.id}>
-                                {castMember.name}{index < 2 && ", "}
-                            </span>
-                        ))}
+                    <div className="max-w-md mx-auto bg-white  rounded-xl shadow-md overflow-hidden md:max-w-2xl border-8 border-blue-500">
+                        <img
+                            className="w-full  object-cover"
+                            src={BASE_IMAGE_URL + movie.backdrop_path}
+                            alt={movie.title}
+                        />
+                        <div className="p-6">
+                            <h2 className="text-xl font-semibold mb-2">{movie.title}</h2>
+                            <p className="text-gray-600 mb-4">{movie.release_date}</p>
+                            <p className="text-gray-700 mb-2">
+                                <span className="font-semibold">Runtime:</span> {movie.runtime} minutes
+                            </p>
+                            <p className="text-gray-700 mb-2">
+                                <span className="font-semibold">Genres:</span>{' '}
+                                {movie.genres &&
+                                    movie.genres.map((genre, index) => (
+                                        <span key={genre.id}>
+                                            {genre.name}
+                                            {index !== movie.genres.length - 1 && ', '}
+                                        </span>
+                                    ))}
+                            </p>
+                            <p className="text-gray-700 mb-2">
+                                <span className="font-semibold">Top 3 Cast Members:</span>{' '}
+                                {movieCredits.cast &&
+                                    movieCredits.cast
+                                        .slice(0, 3)
+                                        .map((castMember, index) => (
+                                            <span key={castMember.id}>
+                                                {castMember.name}
+                                                {index !== 2 && ', '}
+                                            </span>
+                                        ))}
+                            </p>
+                            <p className="text-gray-700 mb-2">
+                                <span className="font-semibold">Director:</span>{' '}
+                                {movieCredits.crew &&
+                                    movieCredits.crew
+                                        .filter((crewMember) => crewMember.job === 'Director')
+                                        .map((director) => (
+                                            <span key={director.id}>{director.name}</span>
+                                        ))}
+                            </p>
+                            <div className="mt-4">
+                                <Link
+                                    to={`/reviewMovie/${id}`}
+                                    className="bg-blue-500 hover:bg-blue-900 text-white font-bold py-2 px-4 rounded inline-block">
+                                    Review
+                                </Link>
+                            </div>
+                            <div className="mt-4">
+                                <button
+                                    onClick={handleWatchlist}
+                                    className="bg-pink-500 hover:bg-pink-900 text-white font-bold py-2 px-4 rounded inline-block disabled:bg-slate-50 disabled:text-slate-500"
+                                    disabled={!user}>
+                                    {watchlistButtonText}
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
-
-                {/* Display Director */}
-                <div className='my-4'>
-                    <span className='text-xl mr-4 text-gray-500'>Director</span>
-                    <div>
-                        {movieCredits.crew && (
-                            movieCredits.crew
-                                .filter((crewMember) => crewMember.job === "Director")
-                                .map((director, index, array) => (
-                                    <span key={director.id}>
-                                        {director.name}{index < array.length - 1 && ", "}
-                                    </span>
-                                ))
-                        )}
-                    </div>
-                </div>
-                <div className='mt-8'>
-                    <Link to={`/reviewMovie/${id}`} className='bg-blue-500 hover:bg-blue-900 text-white font-bold py-2 px-4 rounded'>
-                        Review this movie
-                    </Link>
-                </div>
-
-            </div>
             )}
         </div>
     );

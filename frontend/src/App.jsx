@@ -13,6 +13,9 @@ import Register from './pages/Register';
 import Logout from './pages/Logout';
 import Success from './pages/Success';
 import ReviewMovie from './pages/ReviewMovie';
+
+import SpecificReview from './pages/SpecificReview';
+import SpecificWatchlist from './pages/SpecificWatchlist';
 import { SERVER_URL } from './components/Constants';
 import { useState,useEffect } from 'react';
 
@@ -123,19 +126,21 @@ const App = () => {
       </Sidebar>
 
       <Routes>
-        <Route path="/"               element={<Home />} />
-        <Route path="/explore/:id"    element={<Explore />} />
-        <Route path="/yourreviews"    element={user ? <Reviews     user={user} /> : <Login />}/>
-        <Route path="/yourlists"      element={user ? <Lists       user={user} /> : <Login />}/>
-        <Route path="/community"      element={user ? <Community   user={user} /> : <Login />}/>
-        <Route path="/yourwatchlist"  element={user ? <Watchlist   user={user} /> : <Login />}/>
-        <Route path="/profile"        element={user ? <Profile     user={user} /> : <Login />}/>
-        <Route path="/reviewMovie/:id"    element={user ? <ReviewMovie user={user} /> : <Login />}/>
-        <Route path="/login"          element={<Login />} />
-        <Route path="/help"           element={<Help />} />
-        <Route path="/register"       element={<Register />} />
-        <Route path="/logout"         element={<Logout />} />
-        <Route path="/success"        element={<Success />} />
+        <Route path="/"                   element={<Home />} />
+        <Route path="/explore/:id"        element={<Explore />} />
+        <Route path="/yourreviews"        element={user ? <Reviews      />  : <Login />}/>
+        <Route path="/yourlists"          element={user ? <Lists        />  : <Login />}/>
+        <Route path="/community"          element={user ? <Community    />  : <Login />}/>
+        <Route path="/yourwatchlist"      element={user ? <Watchlist    />  : <Login />}/>
+        <Route path="/profile"            element={user ? <Profile     user={user} /> : <Login />}/>
+        <Route path="/reviewMovie/:id"    element={user ? <ReviewMovie user={user} />   : <Login />}/>
+        <Route path="/login"              element={<Login />} />
+        <Route path="/help"               element={<Help />} />
+        <Route path="/register"           element={<Register />} />
+        <Route path="/logout"             element={user ? <Logout />            : <Login />}/>
+        <Route path="/success"            element={user ? <Success />           : <Login />}/>
+        <Route path="/reviews/:userID"    element={user ? <SpecificReview />    : <Login />}/>
+        <Route path="/watchlist/:userID"  element={user ? <SpecificWatchlist /> : <Login />}/>
       </Routes>
     </div>
   );

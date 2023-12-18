@@ -1,19 +1,14 @@
 import express from "express";
-import {PORT} from './config.js'
 import mongoose from 'mongoose';
-import homeRoute from './routes/home.js'
-import exploreRoute from './routes/explore.js'
 import cors from "cors";
 import dotenv from 'dotenv';
-
-// import authRoute from "./routes/auth.js";
-
-
 import session from "express-session";
 import passport from "passport";
 import GoogleStrategy from "passport-google-oauth20";
 import passportLocalMongoose from "passport-local-mongoose";
 import findOrCreate from "mongoose-findorcreate";
+
+const PORT = process.env.PORT || 5555;
 
 dotenv.config();
 const app = express();
@@ -35,9 +30,6 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 
-//all the routes
-app.use('/home', homeRoute);
-app.use('/explore',exploreRoute);
 
 
 mongoose
@@ -52,6 +44,12 @@ mongoose
     console.log(error);
   });
 
+const movieSchema = new mongoose.Schema({
+  movieID: Number,
+  movieTitle: String
+})
+
+const Movie = new mongoose.model("Movie",movieSchema);
 
 const reviewSchema = new mongoose.Schema({
   movieID : Number,
@@ -68,7 +66,8 @@ const userSchema = new mongoose.Schema({
     secret: String,
     displayName:String,
     photos: String,
-    reviews: [reviewSchema]
+    reviews: [reviewSchema],
+    watchlist: [movieSchema]
 });
 
 
@@ -130,6 +129,9 @@ app.get("/auth/logout",function(req,res){
 });
 
 
+/**
+ * registers the new user
+ */
 app.post("/register",function(req,res){
   console.log("entering register api with username: "+req.body.username+" password: "+req.body.password+" with the displayName: "+req.body.displayName);
   User.register({username: req.body.username, displayName: req.body.displayName}, req.body.password, function(err, user){
@@ -146,7 +148,9 @@ app.post("/register",function(req,res){
     });
 });
 
-
+/**
+ * logs in the already registered user
+ */
 app.post("/login",function(req,res){
   console.log("entering register api with username: "+req.body.username+" password: "+req.body.password);
   const user = new User({
@@ -166,6 +170,28 @@ app.post("/login",function(req,res){
     });
 });
 
+
+
+/**
+ * checks if the user is authenticated or not 
+ * if authenticated return the user details
+ */
+app.get("/auth/check", (req,res) => {
+  if (req.isAuthenticated()) {
+    // Access the user's data from req.user
+    console.log(JSON.stringify(req.user));
+    res.json({ user: req.user });
+  } else {
+    console.log(`entering not authenticated phase at ${new Date()}`);
+    res.status(401).json({ message: "Unauthorized" });
+  }
+});
+
+
+
+/**
+ * submits the review posted by the user 
+ */
 app.post("/submit/review",function(req,res){
   const submittedMovieID = req.body.id;
   const submittedRating = req.body.rating;
@@ -178,59 +204,46 @@ app.post("/submit/review",function(req,res){
     reviewBody: submittedReviewBody,
     movieTitle: submittedMovieTitle
   });
-  console.log("tesyt why not working"+JSON.stringify(req.user));
+  console.log("data recieved for submitting review: "+JSON.stringify(submittedReview));
   User.findById(req.user._id)
       .then(function(foundUser){
           if(foundUser){
-            foundUser.reviews.push(submittedReview);
-            
-            foundUser.save()
+            const existingReviewIndex = foundUser.reviews.findIndex(
+              (review) => String(review.movieID) === String(submittedMovieID)
+            );
+    
+            if (existingReviewIndex >= 0) {
+              foundUser.reviews.splice(existingReviewIndex, 1);
+            }
+            foundUser.reviews.push(submittedReview)
+
+            foundUser
+              .save()
               .then(function(){
                 res.status(200).json({ success: true, message: "Review saved successfully" });
               })
               .catch(function(err){
+                console.log("entering this 2"+err.message);
                 res.status(500).json({ success: false, message: "Review cannot be saved, something went wrong" });
               })
           }
       })
       .catch(function(err){
+        console.log("entering this 1"+err.message);
         res.status(200).json({ success: false, message: "Review failed" });
       })
     
 
 });
 
-//TODO
-// app.get("/auth/login/success", (req, res) => {
-//   console.log("these are my cookiuess"+req);
-// 	if (req.user) {
-// 		res.status(200).json({
-// 			error: false,
-// 			message: "Successfully Loged In",
-// 			user: req.user,
-// 		});
-// 	} else {
-//     console.log("enteringingingingin with dont know");
-// 		res.status(403).json({ error: true, message: "Not Authorized" });
-// 	}
-// });
 
-
-app.get("/auth/check", (req,res) => {
-  if (req.isAuthenticated()) {
-    // Access the user's data from req.user
-    console.log(JSON.stringify(req.user));
-    res.json({ user: req.user });
-  } else {
-    console.log(`entering not authenticated phase at ${new Date()}`);
-    res.status(401).json({ message: "Unauthorized" });
-  }
-});
-
+/**
+ * get all the reviews list for this particular user
+ */
 app.get("/getreviews", (req, res) => {
   if (req.isAuthenticated()) {
     User.findById(req.user._id)
-      .populate("reviews") // Populate the 'reviews' field in the User model
+      .populate("reviews")
       .exec()
       .then((user) => {
         if (user) {
@@ -249,8 +262,290 @@ app.get("/getreviews", (req, res) => {
   }
 });
 
+/**
+ * fetch all the reviews list for the given userID
+ */
+app.get("/reviews/:userID", (req, res) => {
+
+  User.findById(req.params.userID)
+    .populate("reviews")
+    .exec()
+    .then((user) => {
+      if (user) {
+        const userReviews = user.reviews;
+        res.status(200).json({ reviews: userReviews });
+      } else {
+        res.status(404).json({ message: "User not found" });
+      }
+    })
+    .catch((err) => {
+      console.error("Error fetching user reviews:", err);
+      res.status(500).json({ message: "Internal server error" });
+    });
+  
+});
 
 
+
+/**
+ * checks if this partiucular movie is already reviewed by the user,
+ *  if yes returns the review details
+ */
+app.get("/reviewData/:movieID", (req, res) => {
+  if (req.isAuthenticated()) {
+    const movieID = req.params.movieID;
+
+    User.findById(req.user._id)
+      .populate("reviews") // Populate the 'reviews' field in the User model
+      .exec()
+      .then((user) => {
+        if (user) {
+          const userReviews = user.reviews;
+          // Find the review with the matching movieID
+          const matchedReview = userReviews.find(
+            (review) => String(review.movieID) === movieID
+          );
+
+          if (matchedReview) {
+            res.status(200).json({error:false, success:true, review: matchedReview });
+          } else {
+            res.status(200).json({error:false, success:false, message:"Review not found"});
+          }
+        } else {
+          res.status(404).json({error:true, message: "User not found" });
+        }
+      })
+      .catch((err) => {
+        console.error("Error fetching user reviews:", err);
+        res.status(500).json({error:true, message: "Internal server error" });
+      });
+  } else {
+    res.status(401).json({ message: "Unauthorized" });
+  }
+});
+
+/**
+ * deletes this particular review from the users review list
+ */
+app.delete("/delete/review/:movieID", function (req, res) {
+  const movieIDToDelete = req.params.movieID;
+
+  User.findById(req.user._id)
+    .then(function (foundUser) {
+      if (foundUser) {
+        const reviewIndexToDelete = foundUser.reviews.findIndex(
+          (review) => String(review.movieID) === String(movieIDToDelete)
+        );
+
+        if (reviewIndexToDelete >= 0) {
+          foundUser.reviews.splice(reviewIndexToDelete, 1);
+
+          foundUser
+            .save()
+            .then(function () {
+              res.status(200).json({ success: true, message: "Review deleted successfully" });
+            })
+            .catch(function (err) {
+              console.log("Error saving user after deletion:", err.message);
+              res.status(500).json({ success: false, message: "Review deletion failed" });
+            });
+
+        } else {
+          res.status(404).json({ success: false, message: "Review with the provided movieID not found" });
+        }
+
+      } else {
+        res.status(404).json({ success: false, message: "User not found" });
+      }
+    })
+    .catch(function (err) {
+      console.log("Error finding user:", err.message);
+      res.status(500).json({ success: false, message: "Review deletion failed" });
+    });
+});
+
+
+/**
+ * adds the movie in the user's watchlist 
+ */
+app.post("/watchlist/addMovie",function(req,res){
+  const submittedMovieID = req.body.id;
+  const submittedMovieTitle = req.body.movieTitle;
+
+  const submittedMovie = new Movie({
+    movieID: submittedMovieID,
+    movieTitle: submittedMovieTitle
+  });
+  console.log("data recieved for adding movie in watchlist: "+JSON.stringify(submittedMovie));
+  User.findById(req.user._id)
+      .then(function(foundUser){
+          if(foundUser){
+            // const existingReviewIndex = foundUser.reviews.findIndex(
+            //   (review) => String(review.movieID) === String(submittedMovieID)
+            // );
+    
+            // if (existingReviewIndex >= 0) {
+            //   foundUser.reviews.splice(existingReviewIndex, 1);
+            // }
+            foundUser.watchlist.push(submittedMovie)
+
+            foundUser
+              .save()
+              .then(function(){
+                res.status(200).json({ success: true, message: "Movie added to watchlist successfully" });
+              })
+              .catch(function(err){
+                res.status(500).json({ success: false, message: "Movie cannot be added to watchlist, something went wrong" });
+              })
+          }
+      })
+      .catch(function(err){
+        res.status(200).json({ success: false, message: "Review failed" });
+      })
+    
+
+});
+
+
+/**
+ * get all the movies from watchlist of this particular user
+ */
+app.get("/watchlist/getList", (req, res) => {
+  if (req.isAuthenticated()) {
+    User.findById(req.user._id)
+      .populate("watchlist")
+      .exec()
+      .then((user) => {
+        if (user) {
+          const userWatchlist = user.watchlist;
+          res.status(200).json({ watchlist: userWatchlist });
+        } else {
+          res.status(404).json({ message: "User not found" });
+        }
+      })
+      .catch((err) => {
+        console.error("Error fetching user watchlist:", err);
+        res.status(500).json({ message: "Internal server error" });
+      });
+  } else {
+    res.status(401).json({ message: "Unauthorized" });
+  }
+});
+
+/**
+ * checks if this partiucular movie is already watchlisted by the user
+ */
+app.get("/watchlist/:movieID", (req, res) => {
+  if (req.isAuthenticated()) {
+    const movieID = req.params.movieID;
+
+    User.findById(req.user._id)
+      .populate("watchlist") 
+      .exec()
+      .then((user) => {
+        if (user) {
+          const watchlistMovies = user.watchlist;
+          const matchedMovie = watchlistMovies.find(
+            (movie) => String(movie.movieID) === movieID
+          );
+
+          if (matchedMovie) {
+            res.status(200).json({error:false, success:true, message:"movie is found in the user's watchlist" });
+          } else {
+            res.status(200).json({error:false, success:false, message:"Movie not found in user's watchlist"});
+          }
+        } else {
+          res.status(404).json({error:true, message: "User not found" });
+        }
+      })
+      .catch((err) => {
+        console.error("Error fetching user watchlist:", err);
+        res.status(500).json({error:true, message: "Internal server error" });
+      });
+  } else {
+    res.status(401).json({ message: "Unauthorized" });
+  }
+});
+
+/**
+ * deletes this particular review from the users review list
+ */
+app.delete("/watchlist/delete/:movieID", function (req, res) {
+  const movieIDToDelete = req.params.movieID;
+
+  User.findById(req.user._id)
+    .then(function (foundUser) {
+      if (foundUser) {
+        const movieIndexToDelete = foundUser.watchlist.findIndex(
+          (movie) => String(movie.movieID) === String(movieIDToDelete)
+        );
+
+        if (movieIndexToDelete >= 0) {
+          foundUser.watchlist.splice(movieIndexToDelete, 1);
+
+          foundUser
+            .save()
+            .then(function () {
+              res.status(200).json({ success: true, message: "Movie removed from watchlist successfully" });
+            })
+            .catch(function (err) {
+              console.log("Error saving user after deletion:", err.message);
+              res.status(500).json({ success: false, message: "Movie removal from watchlist failed" });
+            });
+
+        } else {
+          res.status(404).json({ success: false, message: "Movie with the provided movieID not found in watchlist" });
+        }
+
+      } else {
+        res.status(404).json({ success: false, message: "User not found" });
+      }
+    })
+    .catch(function (err) {
+      console.log("Error finding user:", err.message);
+      res.status(500).json({ success: false, message: "Review deletion failed" });
+    });
+});
+
+/**
+ * fetch all watchlist for the given userID
+ */
+app.get("/watchlist/user/:userID", (req, res) => {
+
+  User.findById(req.params.userID)
+    .populate("watchlist")
+    .exec()
+    .then((user) => {
+      if (user) {
+        const userWatchlist = user.watchlist;
+        res.status(200).json({ watchlist: userWatchlist });
+      } else {
+        res.status(404).json({ message: "User not found" });
+      }
+    })
+    .catch((err) => {
+      console.error("Error fetching user watchlist:", err);
+      res.status(500).json({ message: "Internal server error" });
+    });
+  
+});
+
+/**
+ * Endpoint to get the entire database (users and their associated data)
+ */
+app.get("/alldata", async (req, res) => {
+  try {
+    const allUserData = await User.find().populate("reviews").exec();
+    res.status(200).json({ data: allUserData });
+  } catch (error) {
+    console.error("Error fetching entire database:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+/**
+ * Welcome message for the SERVER page
+ */
 app.get("/",(req,res)=>{
   return res.send("Welcome to  MovieVerse");
 });

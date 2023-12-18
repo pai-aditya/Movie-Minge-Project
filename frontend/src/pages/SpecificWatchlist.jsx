@@ -1,13 +1,14 @@
-import { useState,useEffect,useCallback } from 'react'
+import { useState,useEffect,useCallback } from 'react';
+import { useParams } from 'react-router-dom';
 import Spinner from '../components/Spinner';
 import { SERVER_URL } from '../components/Constants';
 import ListMoviesCard from '../components/ListMoviesCard';
 
-const Watchlist = () => {
+const SpecificWatchlist = () => {
 
   const [watchlist,setWatchlist] = useState([]);
   const [loading, setLoading] = useState(false);
-  // const [user,setUser] = useState(null);
+  const {userID} = useParams();
   const FetchWatchlistData = useCallback(async () => {
     try{
       const options = {
@@ -17,7 +18,7 @@ const Watchlist = () => {
           'Content-Type': 'application/json',
         }
       };
-        const response = await fetch(`${SERVER_URL}/watchlist/getList`, options);
+        const response = await fetch(`${SERVER_URL}/watchlist/user/${userID}`, options);
         const data = await response.json();
         console.log(data);
         return data;
@@ -25,14 +26,14 @@ const Watchlist = () => {
         console.log(error);
         return [];
     }
-  },[]);
+  },[userID]);
 
   useEffect(() => {
     setLoading(true);
     const fetchData = async () => {
     try{
         const watchlistData = await FetchWatchlistData();
-        console.log("userdata recieved"+JSON.stringify(watchlistData.watchlist));
+        console.log("watchlist for the custom user"+JSON.stringify(watchlistData))
         setWatchlist(watchlistData.watchlist);
         setLoading(false);
     }catch(err){
@@ -47,7 +48,7 @@ const Watchlist = () => {
     
     <div className='p-4 w-full bg-custom-primary-purple'>
       <div className='flex justify-between items-center pt-4 pb-8 text-custom-gold text-4xl font-bold'>
-        Your Watchlist
+        Watchlist
       </div>
         {loading ? (
         <Spinner />
@@ -58,4 +59,4 @@ const Watchlist = () => {
   )
 }
 
-export default Watchlist;
+export default SpecificWatchlist;

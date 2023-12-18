@@ -1,18 +1,13 @@
 
-import { Link } from 'react-router-dom';
-import { AiOutlineEdit } from 'react-icons/ai';
-import { BsInfoCircle } from 'react-icons/bs';
-import { MdOutlineAddBox, MdOutlineDelete } from 'react-icons/md';
+import { useParams } from 'react-router-dom';
 import { useState,useEffect,useCallback } from 'react';
 import { SERVER_URL } from '../components/Constants';
 import Spinner from '../components/Spinner';
-import PopupModal from '../components/PopupModal';
 import Rating from "@mui/material/Rating"
 const Reviews = () => {
   const [reviewList,setReviewList] = useState([]);
   const [loading,setLoading] = useState(false);
-  const [showDeletePopup, setShowDeletePopup] = useState(false);
-  const [selectedReview, setSelectedReview] = useState(null);
+  const {userID} = useParams();
   const FetchReviewsData = useCallback(async () => {
     try{
       const options = {
@@ -22,7 +17,7 @@ const Reviews = () => {
           'Content-Type': 'application/json',
         }
       };
-        const response = await fetch(`${SERVER_URL}/getreviews`, options);
+        const response = await fetch(`${SERVER_URL}/reviews/${userID}`, options);
         const data = await response.json();
         console.log(data);
         return data;
@@ -30,12 +25,7 @@ const Reviews = () => {
         console.log(error);
         return [];
     }
-  },[]);
-
-  const handleDeleteClick = (review) => {
-    setShowDeletePopup(true);
-    setSelectedReview(review.movieID)
-  }
+  },[userID]);
 
 useEffect(() => {
   setLoading(true);
@@ -71,7 +61,7 @@ useEffect(() => {
             <th className='border border-slate-600 rounded-md max-md:hidden'>
               Rating
             </th>
-            <th className='border border-slate-600 rounded-md'>Operations</th>
+            {/* <th className='border border-slate-600 rounded-md'>Operations</th> */}
           </tr>
         </thead>
         <tbody>
@@ -96,37 +86,28 @@ useEffect(() => {
                 size='small' 
               />
               </td>
-              <td className='border border-slate-700 rounded-md text-center'>
+              {/* <td className='border border-slate-700 rounded-md text-center'>
                 <div className='flex justify-center gap-x-4'>
                   <Link to={`/explore/${review.movieID}`}>
                     <BsInfoCircle className='text-2xl text-green-800' />
                   </Link>
                   {/*edit symbol */}
-                  <Link to={`/reviewMovie/${review.movieID}`}>
+                  {/* <Link to={`/reviewMovie/${review.movieID}`}>
                     <AiOutlineEdit className='text-2xl text-yellow-600' />
-                  </Link>
+                  </Link> */}
                   {/* <Link to={`/books/delete/${review._id}`}> */}
-                  <button onClick={() => handleDeleteClick(review)} type="button" className="focus:outline-none">
+                  {/* <button onClick={() => handleDeleteClick(review)} type="button" className="focus:outline-none">
                     <MdOutlineDelete className='text-2xl text-red-600' />
-                  </button>
+                  </button> */}
                   {/* </Link> */}
-                </div>
-              </td>
+                {/* </div> */}
+              {/* </td> */}
             </tr>
           ))}
         </tbody>
       </table>
       )}
       <div>
-      
-      {showDeletePopup && (
-        <PopupModal
-          title="Delete" 
-          contentMessage="Are you sure you want to delete this review?" 
-          buttonMessage="Delete"
-          reviewMovieID={selectedReview}
-          onClose={() => setShowDeletePopup(false)} />
-      )}
       </div>
     </div>
   );
