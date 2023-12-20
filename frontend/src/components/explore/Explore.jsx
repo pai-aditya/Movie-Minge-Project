@@ -16,6 +16,7 @@ const Explore = () => {
     const removeWatchlistButtonText = "Remove from Watchlist";
     const [watchlistButtonText, setWatchlistButtonText] = useState(addWatchlistButtonText);
     const { id } = useParams();
+    
 
     const handleWatchlist = async (e) => {
       setLoading(true);
@@ -78,6 +79,7 @@ const Explore = () => {
       }
       
     };
+
     
     const FetchWatchlistData = useCallback(async () => {
       try{
@@ -205,7 +207,7 @@ const Explore = () => {
         };
         fetchWatchlistData();
   },[FetchWatchlistData])
-
+  
     return (
         <div className="p-4 w-full ">
             <BackButton />
@@ -222,13 +224,13 @@ const Explore = () => {
                             alt={movie.title}
                         />
                         <div className="p-6">
-                            <h2 className="text-xl font-semibold mb-2">{movie.title}</h2>
-                            <p className="text-gray-600 mb-4">{movie.release_date}</p>
+                            <h2 className="text-xl font-bold text-5xl mb-2 flex justify-center">{movie.title}</h2>
+                            <p className="text-gray-600 mb-4  flex justify-center text-2xl">{String(movie.release_date).substring(0,4)}</p>
                             <p className="text-gray-700 mb-2">
-                                <span className="font-semibold">Runtime:</span> {movie.runtime} minutes
+                                <span className="font-semibold text-2xl mr-3">Runtime</span> {movie.runtime} minutes
                             </p>
                             <p className="text-gray-700 mb-2">
-                                <span className="font-semibold">Genres:</span>{' '}
+                                <span className="font-semibold text-2xl mr-3">Genres</span>{' '}
                                 {movie.genres &&
                                     movie.genres.map((genre, index) => (
                                         <span key={genre.id}>
@@ -238,7 +240,7 @@ const Explore = () => {
                                     ))}
                             </p>
                             <p className="text-gray-700 mb-2">
-                                <span className="font-semibold">Top 3 Cast Members:</span>{' '}
+                                <span className="font-semibold text-2xl mr-3">Cast</span>{' '}
                                 {movieCredits.cast &&
                                     movieCredits.cast
                                         .slice(0, 3)
@@ -250,7 +252,7 @@ const Explore = () => {
                                         ))}
                             </p>
                             <p className="text-gray-700 mb-2">
-                                <span className="font-semibold">Director:</span>{' '}
+                                <span className="font-semibold text-2xl mr-3">Director</span>{' '}
                                 {movieCredits.crew &&
                                     movieCredits.crew
                                         .filter((crewMember) => crewMember.job === 'Director')
@@ -258,20 +260,31 @@ const Explore = () => {
                                             <span key={director.id}>{director.name}</span>
                                         ))}
                             </p>
-                            <div className="mt-4">
+                            <div className='flex justify-center'>
+                            <div className="mt-2 mr-2">
                                 <Link
                                     to={`/reviewMovie/${id}`}
                                     className="bg-blue-500 hover:bg-blue-900 text-white font-bold py-2 px-4 rounded inline-block">
                                     Review
                                 </Link>
                             </div>
-                            <div className="mt-4">
+                            <div className="mt-2  mr-2" >
                                 <button
                                     onClick={handleWatchlist}
                                     className="bg-pink-500 hover:bg-pink-900 text-white font-bold py-2 px-4 rounded inline-block disabled:bg-slate-50 disabled:text-slate-500"
                                     disabled={!user}>
                                     {watchlistButtonText}
                                 </button>
+                            </div>
+                            <div className="mt-2 mr-2">
+                              <Link to={`/addToList/${id}`} className="mt-2">
+                                  <button
+                                      className="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded inline-block disabled:bg-slate-50 disabled:text-slate-500"
+                                      disabled={!user}>
+                                      Add to a List
+                                  </button>
+                              </Link>
+                            </div>
                             </div>
                         </div>
                     </div>

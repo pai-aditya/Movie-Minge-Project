@@ -2,16 +2,17 @@ import { useState,useEffect } from 'react';
 import { AiOutlineClose } from 'react-icons/ai';
 import { SERVER_URL } from './Constants';
 import { useNavigate } from 'react-router-dom';
-const PopupModal = ({ title, contentMessage, buttonMessage, reviewMovieID, onClose }) => {
+const PopupModal = ({ title, contentMessage, buttonMessage, id, onClose }) => {
 
     const navigateTo = useNavigate();
     const [loading,setLoading] = useState(false);
-    const handleDeleteReview = async (e) => {
+
+    const handleDeleteReview = async () => {
         setLoading(true);
-        e.preventDefault();
+        // e.preventDefault();
 
         try {
-            const response = await fetch(`${SERVER_URL}/delete/review/${reviewMovieID}`, {
+            const response = await fetch(`${SERVER_URL}/review/delete/${id}`, {
                 method: 'DELETE',
                 headers: {
                 'Content-Type': 'application/json',
@@ -37,6 +38,47 @@ const PopupModal = ({ title, contentMessage, buttonMessage, reviewMovieID, onClo
         console.error('Registration failed:', error.message);
         }
     };
+
+    
+  const handleDeleteCard = async () => {
+    setLoading(true);
+
+    try {
+      const response = await fetch(`${SERVER_URL}/lists/deleteList/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+      });
+
+      const data = await response.json();
+
+      console.log('Login response:', data);
+      if (data.success) {
+        setLoading(false);
+        navigateTo(0);
+      } else {
+        setLoading(false);
+        console.error('Registration failed:', data.message);
+      }
+    } catch (error) {
+      setLoading(false);
+      console.error('Registration failed:', error.message);
+    }
+  };
+  
+
+    const handleDelete = async (e) => {
+        e.preventDefault();
+        console.log("entering12");
+        if(title=="Delete Review"){
+            console.log("entering34");
+            await handleDeleteReview();
+        }else if(title=="Delete Card"){
+            await handleDeleteCard();
+        }
+    }
   
     return (
         <div className='fixed bg-black bg-opacity-50 inset-0 z-50 flex items-center justify-center'>
@@ -49,7 +91,7 @@ const PopupModal = ({ title, contentMessage, buttonMessage, reviewMovieID, onClo
             <p className='text-gray-700 mb-6'>{contentMessage}</p>
             <div className='flex justify-center'>
             <button
-                onClick={handleDeleteReview}
+                onClick={handleDelete}
                 className='bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-6 rounded focus:outline-none focus:shadow-outline'
             >
                 {buttonMessage}

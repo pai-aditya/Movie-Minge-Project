@@ -13,9 +13,13 @@ import Register from './pages/Register';
 import Logout from './pages/Logout';
 import Success from './pages/Success';
 import ReviewMovie from './pages/ReviewMovie';
-
+import ListView from './pages/ListView';
 import SpecificReview from './pages/SpecificReview';
 import SpecificWatchlist from './pages/SpecificWatchlist';
+import ListCreate from './pages/ListCreate';
+import AddToList from './pages/AddToList'
+import SpecificLists from './pages/SpecificLists'
+import SpecificListView from './pages/SpecificListView';
 import { SERVER_URL } from './components/Constants';
 import { useState,useEffect } from 'react';
 
@@ -40,7 +44,6 @@ export const FetchUserData = async () => {
       return null;
     }
 
-    console.log("Data from fetch user:", JSON.stringify(data));
     return data;
 } catch(error){
     console.log(error);
@@ -141,6 +144,12 @@ const App = () => {
         <Route path="/success"            element={user ? <Success />           : <Login />}/>
         <Route path="/reviews/:userID"    element={user ? <SpecificReview />    : <Login />}/>
         <Route path="/watchlist/:userID"  element={user ? <SpecificWatchlist /> : <Login />}/>
+        <Route path="/lists/:userID"  element={user ? <SpecificLists /> : <Login />}/>
+        <Route path="/viewlist/specific/:listID/:userID"   element={user ? <SpecificListView />          : <Login />}/>
+        <Route path="/viewlist/:listID"   element={user ? <ListView />          : <Login />}/>
+        <Route path="/createList"         element={user ? <ListCreate user={user} />        : <Login />}/>
+        <Route path="/addToList/:movieID" element={user ? <AddToList  user={user} />        : <Login />}/>
+        
       </Routes>
     </div>
   );

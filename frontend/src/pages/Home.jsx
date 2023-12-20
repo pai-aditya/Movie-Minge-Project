@@ -128,11 +128,7 @@ const Home = () => {
           Card
         </button>
       </div> */}
-      <div className='flex justify-between items-center pt-4 pb-8'>
-
-      
-
-
+      <div className='flex justify-between items-center pt-4 pb-8'>      
         {/* <h1 className='text-3xl my-8 text-white'>Movies List</h1> */}
         <TitleCard />
         {/* <Link to='/books/create'> */}

@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { BsArrowLeft } from 'react-icons/bs';
-
+import { ArrowLeft ,ChevronLeft} from 'lucide-react';
 const BackButton = () => {
 
   let navigateTo = useNavigate();
@@ -8,8 +8,8 @@ const BackButton = () => {
 
   return (
     <div className='flex'>
-      <button onClick={() => navigateTo(-1)} className='bg-sky-800 text-white px-4 py-1 rounded-lg w-fit'>
-        <BsArrowLeft className='text-2xl' />
+      <button onClick={() => navigateTo(-1)} className='bg-blue-800 text-white px-4 py-1 rounded-lg w-fit'>
+        <ChevronLeft  />
         </button>
     </div>
   );

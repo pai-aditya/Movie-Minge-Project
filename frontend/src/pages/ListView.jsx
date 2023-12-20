@@ -1,16 +1,17 @@
-import { useState,useEffect,useCallback } from 'react';
-import { useParams } from 'react-router-dom';
+import { useState,useEffect,useCallback } from 'react'
 import Spinner from '../components/Spinner';
 import { SERVER_URL } from '../components/Constants';
 import ListMoviesCard from '../components/ListMoviesCard';
+import { useParams } from 'react-router-dom';
 import BackButton from '../components/BackButton';
+const ListView = () => {
 
-const SpecificWatchlist = () => {
-
-  const [watchlist,setWatchlist] = useState([]);
+  const [moviesList,setMoviesList] = useState([]);
+  const [listTitle,setListTitle] = useState();
   const [loading, setLoading] = useState(false);
-  const {userID} = useParams();
-  const FetchWatchlistData = useCallback(async () => {
+  const {listID} = useParams();
+
+  const FetchListMoviesData = useCallback(async () => {
     try{
       const options = {
         method: 'GET',
@@ -19,7 +20,7 @@ const SpecificWatchlist = () => {
           'Content-Type': 'application/json',
         }
       };
-        const response = await fetch(`${SERVER_URL}/watchlist/user/${userID}`, options);
+        const response = await fetch(`${SERVER_URL}/lists/getList/${listID}`, options);
         const data = await response.json();
         console.log(data);
         return data;
@@ -27,15 +28,16 @@ const SpecificWatchlist = () => {
         console.log(error);
         return [];
     }
-  },[userID]);
+  },[]);
 
   useEffect(() => {
     setLoading(true);
     const fetchData = async () => {
     try{
-        const watchlistData = await FetchWatchlistData();
-        console.log("watchlist for the custom user"+JSON.stringify(watchlistData))
-        setWatchlist(watchlistData.watchlist);
+        const listMoviesData = await FetchListMoviesData();
+        console.log("userdata recieved"+JSON.stringify(listMoviesData.watchlist));
+        setListTitle(listMoviesData.title);
+        setMoviesList(listMoviesData.movies);
         setLoading(false);
     }catch(err){
         console.log(err);
@@ -43,22 +45,22 @@ const SpecificWatchlist = () => {
     }
     };
     fetchData();
-},[FetchWatchlistData])
+},[FetchListMoviesData])
 
   return (
     
     <div className='p-4 w-full bg-custom-primary-purple'>
     <BackButton />
       <div className='flex justify-between items-center pt-4 pb-8 text-custom-gold text-4xl font-bold'>
-        Watchlist
+        {listTitle}
       </div>
         {loading ? (
         <Spinner />
         ) : (
-        <ListMoviesCard movies={watchlist} deleteIcon={false} />
+        <ListMoviesCard movies={moviesList} listID={listID} deleteIcon={true}/>
       )}
     </div>
   )
 }
 
-export default SpecificWatchlist;
+export default ListView;

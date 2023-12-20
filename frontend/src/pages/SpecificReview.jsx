@@ -3,7 +3,8 @@ import { useParams } from 'react-router-dom';
 import { useState,useEffect,useCallback } from 'react';
 import { SERVER_URL } from '../components/Constants';
 import Spinner from '../components/Spinner';
-import Rating from "@mui/material/Rating"
+import Rating from "@mui/material/Rating";
+import BackButton from '../components/BackButton';
 const Reviews = () => {
   const [reviewList,setReviewList] = useState([]);
   const [loading,setLoading] = useState(false);
@@ -17,7 +18,7 @@ const Reviews = () => {
           'Content-Type': 'application/json',
         }
       };
-        const response = await fetch(`${SERVER_URL}/reviews/${userID}`, options);
+        const response = await fetch(`${SERVER_URL}/review/getreviews/${userID}`, options);
         const data = await response.json();
         console.log(data);
         return data;
@@ -47,6 +48,7 @@ useEffect(() => {
 },[FetchReviewsData])
   return (
     <div className='p-4 w-full'>
+    <BackButton />
     { loading ? (
       <Spinner />
     ) : (

@@ -8,11 +8,13 @@ import { SERVER_URL } from '../components/Constants';
 import Spinner from '../components/Spinner';
 import PopupModal from '../components/PopupModal';
 import Rating from "@mui/material/Rating"
+
 const Reviews = () => {
   const [reviewList,setReviewList] = useState([]);
   const [loading,setLoading] = useState(false);
   const [showDeletePopup, setShowDeletePopup] = useState(false);
   const [selectedReview, setSelectedReview] = useState(null);
+  
   const FetchReviewsData = useCallback(async () => {
     try{
       const options = {
@@ -22,7 +24,7 @@ const Reviews = () => {
           'Content-Type': 'application/json',
         }
       };
-        const response = await fetch(`${SERVER_URL}/getreviews`, options);
+        const response = await fetch(`${SERVER_URL}/review/getreviews`, options);
         const data = await response.json();
         console.log(data);
         return data;
@@ -35,26 +37,27 @@ const Reviews = () => {
   const handleDeleteClick = (review) => {
     setShowDeletePopup(true);
     setSelectedReview(review.movieID)
-  }
-
-useEffect(() => {
-  setLoading(true);
-  const fetchData = async () => {
-    try {
-      const reviewListData = await FetchReviewsData();
-      setReviewList(reviewListData.reviews);
-      console.log("this is the number of reviews: "+reviewListData.reviews.length)
-      setLoading(false);
-    }
-    catch (error) {
-      console.log(error);
-      setLoading(false);
-
-      return [];
-    }
   };
-  fetchData();
-},[FetchReviewsData])
+
+  useEffect(() => {
+    setLoading(true);
+    const fetchData = async () => {
+      try {
+        const reviewListData = await FetchReviewsData();
+        setReviewList(reviewListData.reviews);
+        console.log("this is the number of reviews: "+reviewListData.reviews.length)
+        setLoading(false);
+      }
+      catch (error) {
+        console.log(error);
+        setLoading(false);
+
+        return [];
+      }
+    };
+    fetchData();
+  },[FetchReviewsData]);
+
   return (
     <div className='p-4 w-full'>
     { loading ? (
@@ -121,10 +124,10 @@ useEffect(() => {
       
       {showDeletePopup && (
         <PopupModal
-          title="Delete" 
+          title="Delete Review" 
           contentMessage="Are you sure you want to delete this review?" 
           buttonMessage="Delete"
-          reviewMovieID={selectedReview}
+          id={selectedReview}
           onClose={() => setShowDeletePopup(false)} />
       )}
       </div>

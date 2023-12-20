@@ -43,7 +43,7 @@ const FetchReviewData = useCallback(async () => {
                 accept: 'application/json',
             }
         };
-        const response = await fetch(`${SERVER_URL}/reviewData/${id}`, options);
+        const response = await fetch(`${SERVER_URL}/review/reviewData/${id}`, options);
         const data = await response.json();
         return data;
     } catch(error){
@@ -100,7 +100,7 @@ useEffect(() => {
     e.preventDefault();
 
     try {
-        const response = await fetch(`${SERVER_URL}/submit/review`, {
+        const response = await fetch(`${SERVER_URL}/review/submit`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -131,7 +131,9 @@ useEffect(() => {
     <div className='p-4'>
       <BackButton />
       {loading ? (
-        <Spinner />
+        <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+          <Spinner />
+        </div>
        ) : (
         <div className='my-4 flex flex-col border-2 border-sky-400 rounded-xl w-[600px] p-4 mx-auto'>
         <h1 className='text-3xl my-4'>Write your movie review</h1>
@@ -165,7 +167,9 @@ useEffect(() => {
             sx={{ fontSize: '4rem' }} 
           />
         </div>
-        <button className='p-2 font-bold bg-blue-500 hover:bg-blue-900 m-8 disabled:bg-slate-50 disabled:text-slate-500 ' onClick={handleSaveReview} disabled={!reviewBody || !rating}>
+        <button className='p-2 font-bold bg-blue-500 hover:bg-blue-900 m-8 disabled:bg-slate-50 disabled:text-slate-500 ' 
+          onClick={handleSaveReview} 
+          disabled={!reviewBody || !rating}>
           Save Review
         </button>
       </div>

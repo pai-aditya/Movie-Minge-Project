@@ -47,9 +47,16 @@ mongoose
 const movieSchema = new mongoose.Schema({
   movieID: Number,
   movieTitle: String
-})
-
+});
 const Movie = new mongoose.model("Movie",movieSchema);
+
+const listSchema = new mongoose.Schema({
+  title: String,
+  description: String,
+  movies: [movieSchema]
+});
+
+const List = new mongoose.model("List",listSchema);
 
 const reviewSchema = new mongoose.Schema({
   movieID : Number,
@@ -67,13 +74,12 @@ const userSchema = new mongoose.Schema({
     displayName:String,
     photos: String,
     reviews: [reviewSchema],
-    watchlist: [movieSchema]
+    watchlist: [movieSchema],
+    lists: [listSchema]
 });
-
 
 userSchema.plugin(passportLocalMongoose);
 userSchema.plugin(findOrCreate);
-
 
 const User = new mongoose.model("User",userSchema);
 
@@ -174,7 +180,7 @@ app.post("/login",function(req,res){
 
 /**
  * checks if the user is authenticated or not 
- * if authenticated return the user details
+ * if authenticated returns the user details
  */
 app.get("/auth/check", (req,res) => {
   if (req.isAuthenticated()) {
@@ -192,7 +198,7 @@ app.get("/auth/check", (req,res) => {
 /**
  * submits the review posted by the user 
  */
-app.post("/submit/review",function(req,res){
+app.post("/review/submit",function(req,res){
   const submittedMovieID = req.body.id;
   const submittedRating = req.body.rating;
   const submittedReviewBody = req.body.reviewBody;
@@ -240,7 +246,7 @@ app.post("/submit/review",function(req,res){
 /**
  * get all the reviews list for this particular user
  */
-app.get("/getreviews", (req, res) => {
+app.get("/review/getreviews", (req, res) => {
   if (req.isAuthenticated()) {
     User.findById(req.user._id)
       .populate("reviews")
@@ -265,7 +271,7 @@ app.get("/getreviews", (req, res) => {
 /**
  * fetch all the reviews list for the given userID
  */
-app.get("/reviews/:userID", (req, res) => {
+app.get("/review/getreviews/:userID", (req, res) => {
 
   User.findById(req.params.userID)
     .populate("reviews")
@@ -291,7 +297,7 @@ app.get("/reviews/:userID", (req, res) => {
  * checks if this partiucular movie is already reviewed by the user,
  *  if yes returns the review details
  */
-app.get("/reviewData/:movieID", (req, res) => {
+app.get("/review/reviewData/:movieID", (req, res) => {
   if (req.isAuthenticated()) {
     const movieID = req.params.movieID;
 
@@ -327,7 +333,7 @@ app.get("/reviewData/:movieID", (req, res) => {
 /**
  * deletes this particular review from the users review list
  */
-app.delete("/delete/review/:movieID", function (req, res) {
+app.delete("/review/delete/:movieID", function (req, res) {
   const movieIDToDelete = req.params.movieID;
 
   User.findById(req.user._id)
@@ -529,6 +535,255 @@ app.get("/watchlist/user/:userID", (req, res) => {
     });
   
 });
+
+
+/**
+ * creates a list for this user 
+ */
+app.post("/lists/create",function(req,res){
+  const submittedListTitle = req.body.listName;
+  const submittedListDescription = req.body.listDescription;
+
+    const createdList = new List({
+    title: submittedListTitle,
+    description: submittedListDescription
+  });
+  User.findById(req.user._id)
+      .then(function(foundUser){
+          if(foundUser){
+          
+            foundUser.lists.push(createdList)
+            
+            foundUser
+              .save()
+              .then(function(){
+                res.status(200).json({ success: true, message: "List created successfully" });
+              })
+              .catch(function(err){
+                res.status(500).json({ success: false, message: "List cannot be created, something went wrong" });
+              })
+          }
+      })
+      .catch(function(err){
+        res.status(200).json({ success: false, message: "List creation failed" });
+      })
+});
+
+/**
+ * add movie to the given list
+ */
+app.post("/lists/addMovie", function(req, res) {
+  const listDetails = req.body.selectedItems;
+  const submittedMovieID = req.body.movieID;
+  const submittedMovieTitle = req.body.movieTitle;
+  console.log("submitted movie id "+submittedMovieID +" and submitted movie title"+submittedMovieTitle);
+  const submittedMovie = new Movie({
+    movieID: submittedMovieID,
+    movieTitle: submittedMovieTitle
+  });
+  console.log("submitted movie"+JSON.stringify(submittedMovie));
+  User.findById(req.user._id)
+    .then(function(foundUser) {
+      if (foundUser) {
+        const promises = Object.keys(listDetails).map(listID => {
+          if (listDetails[listID]) {
+            const selectedList = foundUser.lists.id(listID);
+            console.log("selectedLIst"+selectedList);
+            if (selectedList) {
+              console.log("selectedLIst is true so pushing this "+selectedList);
+              selectedList.movies.push(submittedMovie);
+            }
+          }
+        });
+        console.log("promsiess"+JSON.stringify(promises))
+
+        Promise.all(promises)
+          .then(function() {
+            foundUser.save()
+              .then(function() {
+                res.status(200).json({ success: true, message: "Movie added to selected lists successfully" });
+              })
+              .catch(function(err) {
+                res.status(500).json({ success: false, message: "Failed to add movie to selected lists" });
+              });
+          })
+          .catch(function(err) {
+            res.status(500).json({ success: false, message: "Error processing lists" });
+          });
+      } else {
+        res.status(404).json({ success: false, message: "User not found" });
+      }
+    })
+    .catch(function(err) {
+      res.status(500).json({ success: false, message: "Error finding user" });
+    });
+});
+
+
+/**
+ * remove the give movie from the given list
+ */
+app.delete("/lists/removeMovie", function(req, res) {
+  const movieID = req.body.movie_id;
+  const listID = req.body.listID;
+  console.log("movieID recieved "+ movieID + " listID recieved "+listID);
+
+  User.findById(req.user._id)
+    .then(function(foundUser) {
+      if (foundUser) {
+        const selectedList = foundUser.lists.find(list => list._id.equals(listID));
+        if (selectedList) {
+          const movieIndex = selectedList.movies.findIndex(movie => movie.movieID == movieID);
+          if (movieIndex >= 0) {
+            selectedList.movies.splice(movieIndex, 1);
+            foundUser.save()
+              .then(function() {
+                res.status(200).json({ success: true, message: "Movie removed from list successfully" });
+              })
+              .catch(function(err) {
+                res.status(500).json({ success: false, message: "Failed to remove movie from list" });
+              });
+          } else {
+            res.status(404).json({ success: false, message: "Movie not found in the list" });
+          }
+        } else {
+          res.status(404).json({ success: false, message: "List not found" });
+        }
+      }
+    })
+    .catch(function(err) {
+      res.status(500).json({ success: false, message: "Error finding user" });
+    });
+});
+
+/**
+ * deletes the list with the given listID from the current user's list
+ */
+app.delete("/lists/deleteList/:listID", function(req, res) {
+  const listID = req.params.listID;
+
+  User.findById(req.user._id)
+    .then(function(foundUser) {
+      if (foundUser) {
+        const listIndex = foundUser.lists.findIndex(list => list._id.equals(listID));
+        if (listIndex >= 0) {
+          foundUser.lists.splice(listIndex, 1);
+          foundUser.save()
+            .then(function() {
+              res.status(200).json({ success: true, message: "List deleted successfully" });
+            })
+            .catch(function(err) {
+              res.status(500).json({ success: false, message: "Failed to delete list" });
+            });
+        } else {
+          res.status(404).json({ success: false, message: "List not found" });
+        }
+      } else {
+        res.status(404).json({ success: false, message: "User not found" });
+      }
+    })
+    .catch(function(err) {
+      res.status(500).json({ success: false, message: "Error finding user" });
+    });
+});
+
+
+/**
+ * get the list of all the lists the user has created
+ */
+app.get("/lists/getLists", function(req, res) {
+  if (req.isAuthenticated()) {
+    User.findById(req.user._id)
+      .populate('lists')
+      .exec()
+      .then(function(foundUser) {
+        if (foundUser) {
+          res.status(200).json({ success: true, lists: foundUser.lists });
+        } else {
+          res.status(404).json({ success: false, message: "User not found" });
+        }
+      })
+      .catch(function(err) {
+        res.status(500).json({ success: false, message: "Error fetching lists" });
+      });
+  } else {
+    res.status(401).json({ message: "Unauthorized" });
+  }
+});
+
+/**
+ * get the list of all the lists the user with this userID has created
+ */
+app.get("/lists/getLists/:userID", function(req, res) {
+  const userID = req.params.userID;
+  User.findById(userID)
+    .populate('lists')
+    .exec()
+    .then(function(foundUser) {
+      if (foundUser) {
+        res.status(200).json({ success: true, lists: foundUser.lists });
+      } else {
+        res.status(404).json({ success: false, message: "User not found" });
+      }
+    })
+    .catch(function(err) {
+      res.status(500).json({ success: false, message: "Error fetching lists" });
+    });
+});
+
+/**
+ * get the details of the list with the given listID which
+ *  was created by the current user in the session
+ */
+app.get("/lists/getList/:listID", function(req, res) {
+  const listID = req.params.listID;
+
+  User.findById(req.user._id)
+    .then(function(foundUser) {
+      if (foundUser) {
+        const selectedList = foundUser.lists.find(list => String(list._id) === listID);
+        if (selectedList) {
+          res.status(200).json(selectedList);
+        } else {
+          res.status(404).json({ success: false, message: "List not found" });
+        }
+      } else {
+        res.status(404).json({ success: false, message: "User not found" });
+      }
+    })
+    .catch(function(err) {
+      res.status(500).json({ success: false, message: "Error finding list" });
+    });
+});
+
+/**
+ * get the details of the list with the given listID 
+ * which was created by the user with the given userID
+ */
+app.get("/lists/getList/:listID/:userID", function(req, res) {
+  const listID = req.params.listID;
+  const userID = req.params.userID;
+
+  User.findById(userID)
+    .then(function(foundUser) {
+      if (foundUser) {
+        const selectedList = foundUser.lists.find(list => String(list._id) === listID);
+        if (selectedList) {
+          res.status(200).json(selectedList);
+        } else {
+          res.status(404).json({ success: false, message: "List not found" });
+        }
+      } else {
+        res.status(404).json({ success: false, message: "User not found" });
+      }
+    })
+    .catch(function(err) {
+      res.status(500).json({ success: false, message: "Error finding list" });
+    });
+});
+
+
+
 
 /**
  * Endpoint to get the entire database (users and their associated data)

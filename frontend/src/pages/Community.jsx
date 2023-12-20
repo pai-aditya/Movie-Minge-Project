@@ -67,6 +67,9 @@ useEffect(() => {
             <th className='border border-slate-600 rounded-md max-md:hidden'>
               Watchlist
             </th>
+            <th className='border border-slate-600 rounded-md max-md:hidden'>
+              Lists
+            </th>
             {/* <th className='border border-slate-600 rounded-md'>Operations</th> */}
           </tr>
         </thead>
@@ -92,6 +95,12 @@ useEffect(() => {
               <Link to={`/watchlist/${user._id}`} 
                   className='my-1 px-4 py-1 font-bold bg-blue-500 hover:bg-blue-900 inline-block rounded-md '>
                   View Watchlist
+                </Link>
+              </td>
+              <td className='border border-slate-700 rounded-md text-center max-md:hidden'>
+              <Link to={`/lists/${user._id}`} 
+                  className='my-1 px-4 py-1 font-bold bg-blue-500 hover:bg-blue-900 inline-block rounded-md '>
+                  View Lists
                 </Link>
               </td>
             </tr>

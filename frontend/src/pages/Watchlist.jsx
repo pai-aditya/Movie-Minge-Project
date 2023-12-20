@@ -52,7 +52,7 @@ const Watchlist = () => {
         {loading ? (
         <Spinner />
         ) : (
-        <ListMoviesCard movies={watchlist} />
+        <ListMoviesCard movies={watchlist} deleteIcon={false}/>
       )}
     </div>
   )

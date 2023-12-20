@@ -10,7 +10,8 @@ const MovieSingleCard = ({movie}) => {
     const movie_title = movie.title;
     const rating = (movie.vote_average / 2).toFixed(1);
     return (
-        <div className="max-w-xs rounded overflow-hidden shadow-lg relative">
+        <div className="max-w-xs rounded overflow-hidden shadow-lg relative transition ease-in-out duration-200 hover:scale-105 hover:brightness-110">
+          
           <div className="h-4/5 relative">
             <img className="w-full h-full object-cover" src={image_url} alt={movie_title} />
             <div className="absolute top-0 left-0 w-full h-full bg-black bg-opacity-90 opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
