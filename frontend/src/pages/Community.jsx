@@ -12,14 +12,14 @@ const Community = () => {
     try{
       const options = {
         method: 'GET',
-        credentials:'include',
         headers: {
           'Content-Type': 'application/json',
         }
       };
         const response = await fetch(`${SERVER_URL}/alldata`, options);
+        console.log("all reponse data from /alldata: "+JSON.stringify(response));
         const data = await response.json();
-        console.log(data);
+        console.log("all userss data recieved from /alldata: "+JSON.stringify(data));
         return data;
     } catch(error){
         console.log(error);

@@ -111,14 +111,17 @@ const App = () => {
         
         <hr className="my-3" />
         {showLoginButton ? (
-          <SidebarItem icon={<LogIn       size={20}   />} text="Login" link="/login"/>
+          <div>
+            <SidebarItem icon={<Users       size={20} />} text="MovieVerse Community" link="/community"/>
+            <SidebarItem icon={<LogIn       size={20}   />} text="Login" link="/login"/>
+          </div>
         ) :
         (
           <div>
             <SidebarItem icon={<User        size={20} />} text="Your Profile"         link="/profile" />
             <SidebarItem icon={<BookText    size={20} />} text="Your Reviews"         link="/yourreviews" />
             <SidebarItem icon={<List        size={20} />} text="Your Lists"           link="/yourlists"/>
-            <SidebarItem icon={<Users       size={20} />} text="MovieVerse Community" link="/community"/>
+            
             <SidebarItem icon={<ListChecks  size={20} />} text="Your Watchlist"       link="/yourwatchlist"/>
             <SidebarItem icon={<LogOut      size={20} />} text="Logout"               link="/logout"/>
           </div>
@@ -133,7 +136,7 @@ const App = () => {
         <Route path="/explore/:id"        element={<Explore />} />
         <Route path="/yourreviews"        element={user ? <Reviews      />  : <Login />}/>
         <Route path="/yourlists"          element={user ? <Lists        />  : <Login />}/>
-        <Route path="/community"          element={user ? <Community    />  : <Login />}/>
+        <Route path="/community"          element={<Community /> }/>
         <Route path="/yourwatchlist"      element={user ? <Watchlist    />  : <Login />}/>
         <Route path="/profile"            element={user ? <Profile     user={user} /> : <Login />}/>
         <Route path="/reviewMovie/:id"    element={user ? <ReviewMovie user={user} />   : <Login />}/>
@@ -142,11 +145,11 @@ const App = () => {
         <Route path="/register"           element={<Register />} />
         <Route path="/logout"             element={user ? <Logout />            : <Login />}/>
         <Route path="/success"            element={user ? <Success />           : <Login />}/>
-        <Route path="/reviews/:userID"    element={user ? <SpecificReview />    : <Login />}/>
-        <Route path="/watchlist/:userID"  element={user ? <SpecificWatchlist /> : <Login />}/>
-        <Route path="/lists/:userID"  element={user ? <SpecificLists /> : <Login />}/>
-        <Route path="/viewlist/specific/:listID/:userID"   element={user ? <SpecificListView />          : <Login />}/>
-        <Route path="/viewlist/:listID"   element={user ? <ListView />          : <Login />}/>
+        <Route path="/reviews/:userID"    element={<SpecificReview /> }/>
+        <Route path="/watchlist/:userID"  element={ <SpecificWatchlist />}/>
+        <Route path="/lists/:userID"  element={ <SpecificLists />}/>
+        <Route path="/viewlist/specific/:listID/:userID"   element={<SpecificListView />          }/>
+        <Route path="/viewlist/:listID"   element={<ListView /> }/>
         <Route path="/createList"         element={user ? <ListCreate user={user} />        : <Login />}/>
         <Route path="/addToList/:movieID" element={user ? <AddToList  user={user} />        : <Login />}/>
         

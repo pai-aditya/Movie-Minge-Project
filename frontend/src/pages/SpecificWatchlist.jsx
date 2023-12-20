@@ -14,7 +14,6 @@ const SpecificWatchlist = () => {
     try{
       const options = {
         method: 'GET',
-        credentials:'include',
         headers: {
           'Content-Type': 'application/json',
         }
