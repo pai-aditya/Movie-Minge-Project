@@ -9,11 +9,18 @@ import passportLocalMongoose from "passport-local-mongoose";
 import findOrCreate from "mongoose-findorcreate";
 import ServerlessHttp from "serverless-http";
 
+
+
+
+
 const PORT = process.env.PORT || 5555;
 
 dotenv.config();
 const app = express();
+const router = express.Router();
+
 app.use(express.json());
+
 app.use(cors({
   origin: `${process.env.CLIENT_URL}`,
   credentials: true,
@@ -107,26 +114,26 @@ passport.use(new GoogleStrategy({
   }
 ));
 
-app.get("/auth/google",
+router.get("/auth/google",
     passport.authenticate("google", {scope:["profile","email"]})
 );
 
 
-app.get("/auth/google/callback", 
+router.get("/auth/google/callback", 
   passport.authenticate("google", { failureRedirect: "/auth/login/failed" }),
   function(req, res) {
     return res.redirect(`${process.env.CLIENT_URL}/profile`);
   }
 );
 
-app.get("/auth/login/failed", (req, res) => {
+router.get("/auth/login/failed", (req, res) => {
 	res.status(401).json({
 		error: true,
 		message: "Log in failure",
 	});
 });
 
-app.get("/auth/logout",function(req,res){
+router.get("/auth/logout",function(req,res){
   req.logOut(function(err){
       if(err){
           console.log("logout error: "+err);
@@ -139,7 +146,7 @@ app.get("/auth/logout",function(req,res){
 /**
  * registers the new user
  */
-app.post("/register",function(req,res){
+router.post("/register",function(req,res){
   console.log("entering register api with username: "+req.body.username+" password: "+req.body.password+" with the displayName: "+req.body.displayName);
   User.register({username: req.body.username, displayName: req.body.displayName}, req.body.password, function(err, user){
       if (err) {
@@ -158,7 +165,7 @@ app.post("/register",function(req,res){
 /**
  * logs in the already registered user
  */
-app.post("/login",function(req,res){
+router.post("/login",function(req,res){
   console.log("entering register api with username: "+req.body.username+" password: "+req.body.password);
   const user = new User({
       username: req.body.username,
@@ -183,7 +190,7 @@ app.post("/login",function(req,res){
  * checks if the user is authenticated or not 
  * if authenticated returns the user details
  */
-app.get("/auth/check", (req,res) => {
+router.get("/auth/check", (req,res) => {
   if (req.isAuthenticated()) {
     // Access the user's data from req.user
     console.log(JSON.stringify(req.user));
@@ -199,7 +206,7 @@ app.get("/auth/check", (req,res) => {
 /**
  * submits the review posted by the user 
  */
-app.post("/review/submit",function(req,res){
+router.post("/review/submit",function(req,res){
   const submittedMovieID = req.body.id;
   const submittedRating = req.body.rating;
   const submittedReviewBody = req.body.reviewBody;
@@ -247,7 +254,7 @@ app.post("/review/submit",function(req,res){
 /**
  * get all the reviews list for this particular user
  */
-app.get("/review/getreviews", (req, res) => {
+router.get("/review/getreviews", (req, res) => {
   if (req.isAuthenticated()) {
     User.findById(req.user._id)
       .populate("reviews")
@@ -272,7 +279,7 @@ app.get("/review/getreviews", (req, res) => {
 /**
  * fetch all the reviews list for the given userID
  */
-app.get("/review/getreviews/:userID", (req, res) => {
+router.get("/review/getreviews/:userID", (req, res) => {
 
   User.findById(req.params.userID)
     .populate("reviews")
@@ -298,7 +305,7 @@ app.get("/review/getreviews/:userID", (req, res) => {
  * checks if this partiucular movie is already reviewed by the user,
  *  if yes returns the review details
  */
-app.get("/review/reviewData/:movieID", (req, res) => {
+router.get("/review/reviewData/:movieID", (req, res) => {
   if (req.isAuthenticated()) {
     const movieID = req.params.movieID;
 
@@ -334,7 +341,7 @@ app.get("/review/reviewData/:movieID", (req, res) => {
 /**
  * deletes this particular review from the users review list
  */
-app.delete("/review/delete/:movieID", function (req, res) {
+router.delete("/review/delete/:movieID", function (req, res) {
   const movieIDToDelete = req.params.movieID;
 
   User.findById(req.user._id)
@@ -375,7 +382,7 @@ app.delete("/review/delete/:movieID", function (req, res) {
 /**
  * adds the movie in the user's watchlist 
  */
-app.post("/watchlist/addMovie",function(req,res){
+router.post("/watchlist/addMovie",function(req,res){
   const submittedMovieID = req.body.id;
   const submittedMovieTitle = req.body.movieTitle;
 
@@ -417,7 +424,7 @@ app.post("/watchlist/addMovie",function(req,res){
 /**
  * get all the movies from watchlist of this particular user
  */
-app.get("/watchlist/getList", (req, res) => {
+router.get("/watchlist/getList", (req, res) => {
   if (req.isAuthenticated()) {
     User.findById(req.user._id)
       .populate("watchlist")
@@ -442,7 +449,7 @@ app.get("/watchlist/getList", (req, res) => {
 /**
  * checks if this partiucular movie is already watchlisted by the user
  */
-app.get("/watchlist/:movieID", (req, res) => {
+router.get("/watchlist/:movieID", (req, res) => {
   if (req.isAuthenticated()) {
     const movieID = req.params.movieID;
 
@@ -477,7 +484,7 @@ app.get("/watchlist/:movieID", (req, res) => {
 /**
  * deletes this particular review from the users review list
  */
-app.delete("/watchlist/delete/:movieID", function (req, res) {
+router.delete("/watchlist/delete/:movieID", function (req, res) {
   const movieIDToDelete = req.params.movieID;
 
   User.findById(req.user._id)
@@ -517,7 +524,7 @@ app.delete("/watchlist/delete/:movieID", function (req, res) {
 /**
  * fetch all watchlist for the given userID
  */
-app.get("/watchlist/user/:userID", (req, res) => {
+router.get("/watchlist/user/:userID", (req, res) => {
 
   User.findById(req.params.userID)
     .populate("watchlist")
@@ -541,7 +548,7 @@ app.get("/watchlist/user/:userID", (req, res) => {
 /**
  * creates a list for this user 
  */
-app.post("/lists/create",function(req,res){
+router.post("/lists/create",function(req,res){
   const submittedListTitle = req.body.listName;
   const submittedListDescription = req.body.listDescription;
 
@@ -573,7 +580,7 @@ app.post("/lists/create",function(req,res){
 /**
  * add movie to the given list
  */
-app.post("/lists/addMovie", function(req, res) {
+router.post("/lists/addMovie", function(req, res) {
   const listDetails = req.body.selectedItems;
   const submittedMovieID = req.body.movieID;
   const submittedMovieTitle = req.body.movieTitle;
@@ -624,7 +631,7 @@ app.post("/lists/addMovie", function(req, res) {
 /**
  * remove the give movie from the given list
  */
-app.delete("/lists/removeMovie", function(req, res) {
+router.delete("/lists/removeMovie", function(req, res) {
   const movieID = req.body.movie_id;
   const listID = req.body.listID;
   console.log("movieID recieved "+ movieID + " listID recieved "+listID);
@@ -660,7 +667,7 @@ app.delete("/lists/removeMovie", function(req, res) {
 /**
  * deletes the list with the given listID from the current user's list
  */
-app.delete("/lists/deleteList/:listID", function(req, res) {
+router.delete("/lists/deleteList/:listID", function(req, res) {
   const listID = req.params.listID;
 
   User.findById(req.user._id)
@@ -692,7 +699,7 @@ app.delete("/lists/deleteList/:listID", function(req, res) {
 /**
  * get the list of all the lists the user has created
  */
-app.get("/lists/getLists", function(req, res) {
+router.get("/lists/getLists", function(req, res) {
   if (req.isAuthenticated()) {
     User.findById(req.user._id)
       .populate('lists')
@@ -715,7 +722,7 @@ app.get("/lists/getLists", function(req, res) {
 /**
  * get the list of all the lists the user with this userID has created
  */
-app.get("/lists/getLists/:userID", function(req, res) {
+router.get("/lists/getLists/:userID", function(req, res) {
   const userID = req.params.userID;
   User.findById(userID)
     .populate('lists')
@@ -736,7 +743,7 @@ app.get("/lists/getLists/:userID", function(req, res) {
  * get the details of the list with the given listID which
  *  was created by the current user in the session
  */
-app.get("/lists/getList/:listID", function(req, res) {
+router.get("/lists/getList/:listID", function(req, res) {
   const listID = req.params.listID;
 
   User.findById(req.user._id)
@@ -761,7 +768,7 @@ app.get("/lists/getList/:listID", function(req, res) {
  * get the details of the list with the given listID 
  * which was created by the user with the given userID
  */
-app.get("/lists/getList/:listID/:userID", function(req, res) {
+router.get("/lists/getList/:listID/:userID", function(req, res) {
   const listID = req.params.listID;
   const userID = req.params.userID;
 
@@ -789,7 +796,7 @@ app.get("/lists/getList/:listID/:userID", function(req, res) {
 /**
  * Endpoint to get the entire database (users and their associated data)
  */
-app.get("/alldata", async (req, res) => {
+router.get("/alldata", async (req, res) => {
   try {
     const allUserData = await User.find().populate("reviews").exec();
     res.status(200).json({ data: allUserData });
@@ -802,6 +809,11 @@ app.get("/alldata", async (req, res) => {
 /**
  * Welcome message for the SERVER page
  */
-app.get("/",(req,res)=>{
+router.get("/",(req,res)=>{
   return res.send("Welcome to  MovieVerse");
 });
+
+
+
+app.use('/.netlify/functions/api', router);
+module.exports.handler = ServerlessHttp(app);
