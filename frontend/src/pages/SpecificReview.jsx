@@ -5,6 +5,7 @@ import { SERVER_URL } from '../components/Constants';
 import Spinner from '../components/Spinner';
 import Rating from "@mui/material/Rating";
 import BackButton from '../components/BackButton';
+
 const Reviews = () => {
   const [reviewList,setReviewList] = useState([]);
   const [loading,setLoading] = useState(false);
@@ -46,12 +47,12 @@ useEffect(() => {
   fetchData();
 },[FetchReviewsData])
   return (
-    <div className='p-4 w-full'>
+    <div className='p-4 w-full bg-custom-primary-purple text-white'>
     <BackButton />
     { loading ? (
       <Spinner />
     ) : (
-      <table className='w-full border-separate border-spacing-2'>
+      <table className='w-full mt-2 border-separate border-spacing-2'>
         <thead>
           <tr>
             <th className='border border-slate-600 rounded-md'>No</th>
@@ -71,14 +72,13 @@ useEffect(() => {
               <td className='border border-slate-700 rounded-md text-center'>
                 {index + 1}
               </td>
-              <td className='border border-slate-700 rounded-md text-center'>
+              <td className='border border-slate-700 rounded-md text-center bg-custom-gold font-bold'>
                 {review.movieTitle}
               </td>
-              <td className='border border-slate-700 rounded-md text-center max-md:hidden'>
+              <td className='border border-slate-700 rounded-md text-center max-md:hidden bg-custom-purple'>
                 {review.reviewBody}
               </td>
-              <td className='border border-slate-700 rounded-md text-center max-md:hidden'>
-                {/* {review.rating} */}
+              <td className='border border-slate-700 rounded-md text-center max-md:hidden bg-blue-900'>
                 <Rating
                 name="movie-rating"
                 readOnly

@@ -3,11 +3,11 @@ import { Link } from 'react-router-dom';
 import { useState,useEffect,useCallback } from 'react';
 import { SERVER_URL } from '../components/Constants';
 import Spinner from '../components/Spinner';
-
+import TitleCard from '../components/TitleCard';
 const Community = () => {
   const [userList,setUserList] = useState([]);
   const [loading,setLoading] = useState(false);
-  // const [selectedReview, setSelectedReview] = useState(null);
+
   const FetchUserData = useCallback(async () => {
     try{
       const options = {
@@ -17,9 +17,7 @@ const Community = () => {
         }
       };
         const response = await fetch(`${SERVER_URL}/alldata`, options);
-        console.log("all reponse data from /alldata: "+JSON.stringify(response));
         const data = await response.json();
-        console.log("all userss data recieved from /alldata: "+JSON.stringify(data));
         return data;
     } catch(error){
         console.log(error);
@@ -49,7 +47,10 @@ useEffect(() => {
 
 
   return (
-    <div className='p-4 w-full'>
+    <div className='p-4 w-full bg-custom-primary-purple text-white'>
+    <div className='flex items-center justify-beteween my-4 mr-4 '>
+        <TitleCard />
+      </div>
     { loading ? (
       <Spinner />
     ) : (
@@ -70,7 +71,6 @@ useEffect(() => {
             <th className='border border-slate-600 rounded-md max-md:hidden'>
               Lists
             </th>
-            {/* <th className='border border-slate-600 rounded-md'>Operations</th> */}
           </tr>
         </thead>
         <tbody>
@@ -79,27 +79,27 @@ useEffect(() => {
               <td className='border border-slate-700 rounded-md text-center'>
                 {index + 1}
               </td>
-              <td className='border border-slate-700 rounded-md text-center'>
+              <td className='border border-slate-700 rounded-md text-center bg-custom-purple font-bold '>
                 {user.displayName}
               </td>
-              <td className='border border-slate-700 rounded-md text-center max-md:hidden'>
+              <td className='border border-slate-700 rounded-md text-center max-md:hidden bg-custom-gold font-bold'>
                 {user.username}
               </td>
               <td className='border border-slate-700 rounded-md text-center max-md:hidden'>
               <Link to={`/reviews/${user._id}`} 
-                  className='my-1 px-4 py-1 font-bold bg-blue-500 hover:bg-blue-900 inline-block rounded-md '>
+                  className='my-1 px-4 py-1 font-bold bg-blue-800 hover:bg-blue-900 inline-block rounded-md '>
                   View Reviews
                 </Link>
               </td>
               <td className='border border-slate-700 rounded-md text-center max-md:hidden'>
               <Link to={`/watchlist/${user._id}`} 
-                  className='my-1 px-4 py-1 font-bold bg-blue-500 hover:bg-blue-900 inline-block rounded-md '>
+                  className='my-1 px-4 py-1 font-bold bg-blue-800 hover:bg-blue-900 inline-block rounded-md '>
                   View Watchlist
                 </Link>
               </td>
               <td className='border border-slate-700 rounded-md text-center max-md:hidden'>
               <Link to={`/lists/${user._id}`} 
-                  className='my-1 px-4 py-1 font-bold bg-blue-500 hover:bg-blue-900 inline-block rounded-md '>
+                  className='my-1 px-4 py-1 font-bold bg-blue-800 hover:bg-blue-900 inline-block rounded-md '>
                   View Lists
                 </Link>
               </td>

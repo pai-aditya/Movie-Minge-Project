@@ -3,7 +3,7 @@ import { useState } from 'react';
 
 const AddToListSingleCard = ({ list,handleSelect }) => {
 
-  const colors = ['bg-blue-400', 'bg-green-400', 'bg-purple-400', 'bg-yellow-400', 'bg-pink-400'];
+  const colors = ['bg-blue-800', 'bg-green-800', 'bg-purple-800', 'bg-yellow-800', 'bg-pink-800'];
   const [selected, setSelected] = useState(false);
 
   

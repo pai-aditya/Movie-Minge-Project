@@ -4,6 +4,7 @@ import Spinner from '../components/Spinner';
 import {useNavigate, useParams } from 'react-router-dom';
 import Rating from '@mui/material/Rating';
 import { SERVER_URL } from '../components/Constants';
+import TitleCard from '../components/TitleCard';
 
 const ReviewMovie = (userDetails) => {
   const [reviewBody, setReviewBody] = useState('');
@@ -114,7 +115,7 @@ useEffect(() => {
         console.log('Registration response:', data);
         if (data.success) {
           setLoading(false);
-          navigateTo("/");
+          navigateTo("/yourreviews");
           // navigateTo("/profile");
           
         } else {
@@ -128,30 +129,34 @@ useEffect(() => {
   };
 
   return (
-    <div className='p-4'>
-      <BackButton />
+    <div className= 'p-4 w-full bg-custom-primary-purple text-white'>
+    
+      <BackButton  />
       {loading ? (
         <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
           <Spinner />
         </div>
        ) : (
-        <div className='my-4 flex flex-col border-2 border-sky-400 rounded-xl w-[600px] p-4 mx-auto'>
-        <h1 className='text-3xl my-4'>Write your movie review</h1>
-        <div className='my-4'>
-          <label className='text-xl mr-4 text-gray-500'>Movie</label>
+        <div className='flex flex-col border-2 border-sky-400 rounded-xl w-1/2 p-4 mx-auto bg-gray-800'>
+        <div className='flex items-center justify-center my-4 mr-4 '>
+          <TitleCard />
+        </div>
+        <h1 className='text-3xl my-4 text-center font-bold text-gray-200'>Write your movie review!</h1>
+        <div className='my-3'>
+          <label className='text-xl mr-4 text-gray-400'>Movie</label>
           <p>{movieTitle}</p>
         </div>
-        <div className='my-4'>
-          <label className='text-xl mr-4 text-gray-500'>Review by</label>
+        <div className='my-3'>
+          <label className='text-xl mr-4 text-gray-400'>Review by</label>
           <p>{authorName}</p>
         </div>
-        <div className='my-4'>
-          <label className='text-xl mr-4 text-gray-500'>Your Review</label>
+        <div className='my-3'>
+          <label className='text-xl mr-4 text-gray-400'>Your Review</label>
           <textarea
             value={reviewBody}
             onChange={(e) => setReviewBody(e.target.value)}
-            className='border-2 border-gray-500 px-4 py-2 w-full'
-            rows={4}
+            className='border-2 border-gray-400 px-4 py-2 w-full bg-gray-700'
+            rows={3}
           />
         </div>
         <div className='my-4 flex justify-center item-center'>
@@ -167,7 +172,7 @@ useEffect(() => {
             sx={{ fontSize: '4rem' }} 
           />
         </div>
-        <button className='p-2 font-bold bg-blue-500 hover:bg-blue-900 m-8 disabled:bg-slate-50 disabled:text-slate-500 ' 
+        <button className='p-2 font-bold bg-blue-500 hover:bg-blue-900 m-8 disabled:bg-gray-500 disabled:text-gray-300 ' 
           onClick={handleSaveReview} 
           disabled={!reviewBody || !rating}>
           Save Review
@@ -175,7 +180,7 @@ useEffect(() => {
       </div>
     
       )}
-      </div>
+    </div>
       
   );
 };

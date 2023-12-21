@@ -83,12 +83,12 @@ const PopupModal = ({ title, contentMessage, buttonMessage, id, onClose }) => {
     return (
         <div className='fixed bg-black bg-opacity-50 inset-0 z-50 flex items-center justify-center'>
         <div onClick={onClose} className='absolute inset-0 bg-black opacity-25'></div>
-        <div className='relative bg-white rounded-lg shadow-lg max-w-lg w-full p-6 text-center'>
-            <button onClick={onClose} className='absolute top-3 right-3 text-gray-600 hover:text-gray-800 focus:outline-none'>
+        <div className='relative bg-gray-900 rounded-lg shadow-lg max-w-lg w-full p-6 text-center'>
+            <button onClick={onClose} className='absolute top-3 right-3 text-gray-400 hover:text-gray-700 focus:outline-none'>
             <AiOutlineClose className='text-xl' />
             </button>
             <h2 className='text-2xl font-semibold mb-4'>{title}</h2>
-            <p className='text-gray-700 mb-6'>{contentMessage}</p>
+            <p className='text-gray-400 mb-6'>{contentMessage}</p>
             <div className='flex justify-center'>
             <button
                 onClick={handleDelete}

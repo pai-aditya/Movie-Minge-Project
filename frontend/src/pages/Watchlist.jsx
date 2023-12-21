@@ -7,7 +7,6 @@ const Watchlist = () => {
 
   const [watchlist,setWatchlist] = useState([]);
   const [loading, setLoading] = useState(false);
-  // const [user,setUser] = useState(null);
   const FetchWatchlistData = useCallback(async () => {
     try{
       const options = {

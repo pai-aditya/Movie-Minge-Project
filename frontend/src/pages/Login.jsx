@@ -10,7 +10,7 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const navigateTo  = useNavigate ();
 
-  const googleAuth = () => {
+  const googleAuth = () => {  
     window.open(
       `${SERVER_URL}/auth/google`,
       "_self"
@@ -92,12 +92,12 @@ const Login = () => {
               onChange={(e) => setPassword(e.target.value)}
             />
           </div>
-          <button className="w-full py-3 mt-8 bg-indigo-600 hover:bg-indigo-500 relative text-white rounded-lg" type="submit">
+          <button className="w-full py-3 mt-8 bg-indigo-600 hover:bg-indigo-800 relative text-white rounded-lg" type="submit">
             Sign In
           </button>
           {/* Google login button */}
-          <div className="flex justify-center py-4">
-            <button type="button" onClick={googleAuth} className="px-6 py-2 relative flex items-center rounded-lg shadow-lg hover:shadow-xl bg-indigo-600 text-white">
+          <div className="flex justify-center py-4 ">
+            <button type="button" onClick={googleAuth} className="px-6  py-2 relative flex items-center rounded-lg shadow-lg hover:shadow-xl hover:bg-red-900 bg-red-700 text-white">
               Sign in with  <FcGoogle className="ml-4 mr-1" size={20} />Google
             </button>
           </div>
@@ -106,7 +106,7 @@ const Login = () => {
             <p className="text-gray-400 flex items-center">
               Not a member?
               <Link to="/register">
-              <button className="ml-2 px-4 py-2 relative flex items-center rounded-lg shadow-lg hover:shadow-xl bg-indigo-600 text-white">
+              <button className="ml-2 px-4 py-2 relative flex items-center rounded-lg shadow-lg hover:shadow-xl hover:bg-indigo-800 bg-indigo-600 text-white">
                 Register Now
               </button>
               </Link>

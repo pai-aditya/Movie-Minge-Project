@@ -1,7 +1,6 @@
 import { Link, useParams } from 'react-router-dom';
 import { useCallback,useState,useEffect } from 'react';
 import { SERVER_URL } from '../components/Constants';
-import { MdOutlineAddBox } from 'react-icons/md';
 import TitleCard from '../components/TitleCard';
 import ListSingleCard from './ListSingleCard';
 import Spinner from '../components/Spinner';
@@ -54,20 +53,11 @@ const SpecificLists = () => {
         {loading ? (
             <Spinner />
         ) : (      
-        
-            <div>
-                <div className='flex items-center justify-between my-4 mr-4'>
-                    <TitleCard />
-                    {/* <Link to='/createList' className='ml-auto' >
-                        <MdOutlineAddBox className='text-sky-800 text-5xl' />
-                    </Link> */}
-                </div>
-                <div className='grid xs:grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4'>
-                    {lists.map((item) => (
-                    <ListSingleCard key={item._id} list={item} deleteIcon={false} userID={userID}/>
-                    ))}
-                </div>
-            </div>
+              <div className='grid xs:grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4'>
+                  {lists.map((item) => (
+                  <ListSingleCard key={item._id} list={item} deleteIcon={false} userID={userID}/>
+                  ))}
+              </div>
         )}
         </div>
   );

@@ -1,5 +1,5 @@
 import { FcGoogle } from 'react-icons/fc';
-import {Link,useNavigate  } from 'react-router-dom';
+import { Link, useNavigate  } from 'react-router-dom';
 import { useState } from 'react';
 import { SERVER_URL } from '../components/Constants';
 import Spinner from '../components/Spinner';
@@ -107,15 +107,25 @@ const Register = () => {
             />
           </div>
           {/* <Link to="/profile" > */}
-          <button className="w-full py-3 mt-8 bg-indigo-600 hover:bg-indigo-500 relative text-white rounded-lg" type="submit">
+          <button className="w-full py-3 mt-8 hover:bg-indigo-800 bg-indigo-600 relative text-white rounded-lg" type="submit">
             Register
           </button>
           {/* </Link> */}
           {/* Google login button */}
-          <div className="flex justify-center py-8">
-            <button type="button"  onClick={googleAuth} className="px-6 py-2 relative flex items-center rounded-lg shadow-lg hover:shadow-xl bg-indigo-600 text-white">
-              <FcGoogle className="mr-2" size={20} /> Google
+          <div className="flex justify-center py-4">
+            <button type="button"  onClick={googleAuth} className="px-6 py-2 relative flex items-center rounded-lg shadow-lg hover:shadow-xl hover:bg-red-900 bg-red-700 text-white">
+              Sign in with <FcGoogle className="ml-4 mr-1" size={20} /> Google
             </button>
+          </div>
+          <div className="flex justify-center py-4">
+            <p className="text-gray-400 flex items-center">
+              Already a member?
+              <Link to="/login">
+              <button className="ml-2 px-4 py-2 relative flex items-center rounded-lg shadow-lg hover:shadow-xl hover:bg-indigo-800 bg-indigo-600 text-white">
+                Login Now
+              </button>
+              </Link>
+            </p>
           </div>
         </form>
       </div>

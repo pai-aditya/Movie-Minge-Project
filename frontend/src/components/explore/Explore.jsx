@@ -6,16 +6,16 @@ import { SERVER_URL } from '../Constants';
 import { FetchUserData } from '../../App';
 
 const Explore = () => {
-    const BASE_IMAGE_URL = "https://image.tmdb.org/t/p/w500";
-    const navigateTo = useNavigate();
-    const [movie, setMovie] = useState({genres: []});
-    const [movieCredits, setMovieCredits] = useState({cast: [],crew: []});
-    const [user,setUser] = useState(null);
-    const [loading, setLoading] = useState(false);
-    const addWatchlistButtonText = "Add to Watchlist";
-    const removeWatchlistButtonText = "Remove from Watchlist";
-    const [watchlistButtonText, setWatchlistButtonText] = useState(addWatchlistButtonText);
-    const { id } = useParams();
+  const BASE_IMAGE_URL = "https://image.tmdb.org/t/p/w500";
+  const navigateTo = useNavigate();
+  const [movie, setMovie] = useState({genres: []});
+  const [movieCredits, setMovieCredits] = useState({cast: [],crew: []});
+  const [user,setUser] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const addWatchlistButtonText = "Add to Watchlist";
+  const removeWatchlistButtonText = "Remove from Watchlist";
+  const [watchlistButtonText, setWatchlistButtonText] = useState(addWatchlistButtonText);
+  const { id } = useParams();
     
 
     const handleWatchlist = async (e) => {
@@ -37,9 +37,7 @@ const Explore = () => {
         console.log('Deletion response:', data);
         if (data.success) {
             setLoading(false);
-            // onClose();
-            navigateTo(0);
-            // navigateTo("/profile");
+            navigateTo("/yourwatchlist");
             
         } else {
             setLoading(false);
@@ -65,9 +63,7 @@ const Explore = () => {
           console.log('Watchlist response:', data);
           if (data.success) {
             setLoading(false);
-            navigateTo(0);
-            // navigateTo("/profile");
-            
+            navigateTo("/yourwatchlist");
           } else {
             setLoading(false);
             console.error('Registration failed:', data.message);
@@ -209,27 +205,26 @@ const Explore = () => {
   },[FetchWatchlistData])
   
     return (
-        <div className="p-4 w-full ">
+        <div className="p-4 w-full bg-custom-primary-purple text-white">
             <BackButton />
-            <h1 className="text-3xl my-4">Movie Info</h1>
             {loading ? (
                 <Spinner />
             ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full ">
+                <div className=" w-full  ">
                     
-                    <div className="max-w-md mx-auto bg-white  rounded-xl shadow-md overflow-hidden md:max-w-2xl border-8 border-blue-500">
+                    <div className="max-w-md mx-auto bg-white  rounded-xl shadow-md overflow-hidden md:max-w-2xl border-4 border-blue-500">
                         <img
                             className="w-full  object-cover"
                             src={BASE_IMAGE_URL + movie.backdrop_path}
                             alt={movie.title}
                         />
-                        <div className="p-6">
-                            <h2 className="text-xl font-bold text-5xl mb-2 flex justify-center">{movie.title}</h2>
-                            <p className="text-gray-600 mb-4  flex justify-center text-2xl">{String(movie.release_date).substring(0,4)}</p>
-                            <p className="text-gray-700 mb-2">
+                        <div className="p-4 bg-gray-900 text-white">
+                            <h2 className="text-xl font-bold text-5xl mb-1 flex justify-center">{movie.title}</h2>
+                            <p className="text-gray-400  flex justify-center text-2xl">{String(movie.release_date).substring(0,4)}</p>
+                            <p className="text-gray-400 mb-1 text-xl">
                                 <span className="font-semibold text-2xl mr-3">Runtime</span> {movie.runtime} minutes
                             </p>
-                            <p className="text-gray-700 mb-2">
+                            <p className="text-gray-400 mb-1 text-xl">
                                 <span className="font-semibold text-2xl mr-3">Genres</span>{' '}
                                 {movie.genres &&
                                     movie.genres.map((genre, index) => (
@@ -239,7 +234,7 @@ const Explore = () => {
                                         </span>
                                     ))}
                             </p>
-                            <p className="text-gray-700 mb-2">
+                            <p className="text-gray-400 mb-1 text-xl">
                                 <span className="font-semibold text-2xl mr-3">Cast</span>{' '}
                                 {movieCredits.cast &&
                                     movieCredits.cast
@@ -251,7 +246,7 @@ const Explore = () => {
                                             </span>
                                         ))}
                             </p>
-                            <p className="text-gray-700 mb-2">
+                            <p className="text-gray-400 mb-1 text-xl">
                                 <span className="font-semibold text-2xl mr-3">Director</span>{' '}
                                 {movieCredits.crew &&
                                     movieCredits.crew
@@ -271,7 +266,7 @@ const Explore = () => {
                             <div className="mt-2  mr-2" >
                                 <button
                                     onClick={handleWatchlist}
-                                    className="bg-pink-500 hover:bg-pink-900 text-white font-bold py-2 px-4 rounded inline-block disabled:bg-slate-50 disabled:text-slate-500"
+                                    className="bg-pink-500 hover:bg-pink-900 text-white font-bold py-2 px-4 rounded inline-block disabled:bg-gray-500 disabled:text-gray-300"
                                     disabled={!user}>
                                     {watchlistButtonText}
                                 </button>
@@ -279,7 +274,7 @@ const Explore = () => {
                             <div className="mt-2 mr-2">
                               <Link to={`/addToList/${id}`} className="mt-2">
                                   <button
-                                      className="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded inline-block disabled:bg-slate-50 disabled:text-slate-500"
+                                      className="bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded inline-block disabled:bg-gray-500 disabled:text-gray-300"
                                       disabled={!user}>
                                       Add to a List
                                   </button>

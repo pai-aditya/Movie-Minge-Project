@@ -52,15 +52,14 @@ const Lists = () => {
         {loading ? (
             <Spinner />
         ) : (      
-        
             <div>
                 <div className='flex items-center justify-between my-4 mr-4'>
                     <TitleCard />
                     <Link to='/createList' className='ml-auto' >
-                        <MdOutlineAddBox className='text-sky-800 text-5xl' />
+                        <MdOutlineAddBox className='text-custom-gold text-5xl' />
                     </Link>
                 </div>
-                <div className='grid xs:grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4'>
+                <div className='grid xs:grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4'>
                     {lists.map((item) => (
                     <ListSingleCard key={item._id} list={item} deleteIcon={true} />
                     ))}
