@@ -804,3 +804,5 @@ app.get("/alldata", async (req, res) => {
 app.get("/",(req,res)=>{
   return res.send("Welcome to  MovieVerse");
 });
+
+export default app;
