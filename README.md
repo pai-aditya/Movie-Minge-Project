@@ -15,6 +15,8 @@ Welcome to MovieVerse, an innovative full-stack application that revolutionizes 
 
 * **Data Management:** Users have complete control over their data, with the ability to modify, delete, or enhance their content within MovieVerse.
 
+## [Demo Video](https://drive.google.com/drive/folders/1wb9zmC1krbIloWP-VyzXGDzafHVyW9g6)
+
 ## Tech Stack
 
 * **Frontend:** React with Tailwind CSS
