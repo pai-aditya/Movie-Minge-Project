@@ -45,24 +45,28 @@ This project utilizes an .env file to manage environment-specific configuration 
 
 **Server side**
 
-```
-cd backend 
-npm i
-nodemon index.js
-```
+
+`cd backend` 
+
+`npm i`
+
+`nodemon index.js`
+
 The server will start running on localhost:5555.
 
 ***Client Side***
 
-```
-cd frontend
-npm i 
-npm run dev
-```
+
+`cd frontend`
+
+`npm i`
+
+`npm run dev`
+
 The client will start running on localhost:5173.
 
 ## Author
 
-- Github: [@pai-aditya](https://github.com/pai-aditya)
-- Linkedin: [@pai-aditya](https://www.linkedin.com/in/aditya-pai-581b2621a/)
-- Email: [@pai-aditya](mailto:pai.aditya2011@gmail.com)
+- Github: [pai-aditya](https://github.com/pai-aditya)
+- Linkedin: [Aditya Pai](https://www.linkedin.com/in/aditya-pai-581b2621a/)
+- Email: [pai.aditya2011@gmail.com](mailto:pai.aditya2011@gmail.com)
