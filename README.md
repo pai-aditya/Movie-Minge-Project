@@ -46,22 +46,22 @@ This project utilizes an .env file to manage environment-specific configuration 
 **Server side**
 
 
-`cd backend` 
+```cd backend```
 
-`npm i`
+```npm i```
 
-`nodemon index.js`
+```nodemon index.js```
 
 The server will start running on localhost:5555.
 
 ***Client Side***
 
 
-`cd frontend`
+```cd frontend```
 
-`npm i`
+```npm i```
 
-`npm run dev`
+```npm run dev```
 
 The client will start running on localhost:5173.
 
